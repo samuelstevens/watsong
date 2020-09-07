@@ -24,12 +24,16 @@ function songDisplay() {
     addSongs([]);
 }
 
+//const URL = 'https://open.spotify.com/embed/playlist/6pK46CrbkO1az5HaUmqpow';
 function showPlaylist() {
-    setTimeout(() => {
-        const playlist = $("#playlist");
-        playlist.empty();
-        playlist.append('<iframe src="https://open.spotify.com/embed/playlist/6pK46CrbkO1az5HaUmqpow"width="100%" height="380" frameborder="0" allowtransparency="true" allow="encrypted-media" id="spotify"></iframe>')
-    }, 0);
+    createPlaylist((id) => {
+        setTimeout(() => {
+            const playlist = $("#playlist");
+            playlist.empty();
+            playlist.append('<iframe width="100%" height="380" frameborder="0" allowtransparency="true" allow="encrypted-media" id="spotify"></iframe>')
+            $('#spotify').attr('src', 'https://open.spotify.com/embed/playlist/' + id);
+        }, 0);
+    });
 }
 
 songDisplay();
