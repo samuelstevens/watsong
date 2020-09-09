@@ -6,7 +6,9 @@ from . import jukebox
 
 
 def create_app(test_config=None) -> Flask:
-    # create and configure the app
+    """
+    Creates and configures the app. Flask uses this as the entry point.
+    """
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_mapping(
         SECRET_KEY=os.environ["SECRET_KEY"],
@@ -25,6 +27,9 @@ def create_app(test_config=None) -> Flask:
 
     @app.route("/")
     def index():
+        """
+        Redirect index to /jukebox
+        """
         return redirect(url_for("jukebox.jukebox"))
 
     return app

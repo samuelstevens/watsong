@@ -52,4 +52,4 @@ flask run
 
 4. Open application in browser
 
-[https://localhost:5000/jukebox](https://localhost:5000/jukebox)
+[https://localhost:5000/](https://localhost:5000/)
