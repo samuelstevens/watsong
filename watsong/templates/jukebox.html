@@ -6,7 +6,7 @@
 
 {% block content %}
 <div id="prompt">
-  <form id="query-form">
+  <form action={{ url_for('jukebox.jukebox') }} method="post">
     <p>What are you looking for?</p>
     <input type="text" placeholder="Beach tunes for 4th of July" name="query">
     <input type="submit" />
@@ -15,45 +15,27 @@
 <h2>Songs</h2>
 <button onclick="showPlaylist()">Show on Spotify</button>
 <div id="playlist">
+  {% for song in songs %}
+    <div class="song">
+      <p class="title">{{ song['song'] }}</p>
+      <p class="artist">{{ song['artist'] }}</p>
+    </div>
+  {% endfor %}
 </div>
 <div id="dials">
-  <div class="dial" id="energy">
-    <img src="{{ url_for('static', filename='images/dial.png') }}" />
-    <button class="less" onclick="less(this)">Less</button>
-    <span>Energy</span>
-    <button class="more" onclick="addEnergy(this)">More</button>
-    <br />
-    <button onclick="reload()">GO!</button>
-  </div>
-
-  <div class="dial" id="dance">
-    <img src="{{ url_for('static', filename='images/dial.png') }}" />
-    <button class="less" onclick="less(this)">Less</button>
-    <span>Dance</span>
-    <button class="more" onclick="more(this)">More</button>
-    <br />
-    <button onclick="reload()">GO!</button>
-  </div>
-
-  <div class="dial" id="lyrics">
-    <img src="{{ url_for('static', filename='images/dial.png') }}" />
-    <button class="less" onclick="removeLyrics(this)">Less</button>
-    <span>Lyrics</span>
-    <button class="more" onclick="more(this)">More</button>
-    <br />
-    <button onclick="reload()">GO!</button>
-  </div>
-
-  <div class="dial" id="melody">
-    <img src="{{ url_for('static', filename='images/dial.png') }}" />
-    <button class="less" onclick="less(this)">Less</button>
-    <span>Melody</span>
-    <button class="more" onclick="more(this)">More</button>
-    <br />
-    <button onclick="reload()">GO!</button>
-  </div>
+  {% for dial in dials %}
+    <div class="dial" id="energy">
+      <p>|</p>
+      
+      <div>
+        <img style="transform: rotate(5.79061rad);" src="{{ url_for('static', filename='images/dial.png') }}" />
+      </div>
+      
+      <span>{{ dial.lower().capitalize() }}</span>
+    </div>
+  {% endfor %}
 </div>
 
-<script src="{{ url_for('static', filename = 'js/demo.js') }}"></script>
-
+<script src="{{ url_for('static', filename = 'js/draggable.js') }}"></script>
+    
 {% endblock %}

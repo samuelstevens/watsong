@@ -6,7 +6,7 @@
 }
 
 main {
-  max-width: 60%;
+  max-width: min(800px, 98%);
   margin: auto;
 }
 
@@ -21,9 +21,8 @@ button {
   text-align: center;
 }
 
-.dial > img {
+.dial img {
   width: 100%;
-  rotate: -31deg;
   transition: all 1s ease;
 }
 
