@@ -31,17 +31,14 @@ pip install -r requirements.txt
 2. Activate dev environment
 
 ### macOS
-
 ```sh
 . ./envs/dev-unix.sh
 ```
 
 ### Windows
-
-> I'm not completely sure how to activate environment variables in Windows. At a minimum, you can copy-paste the script contents into a shell. Does anyone know?
-
+1. Set up environment variables
 ```sh
-# somehow run ./envs/dev-windows.bat
+.\envs\dev-windows.bat
 ```
 
 3. Run application

@@ -1,3 +1,5 @@
+node_modules
+
 # whatever you call your virtual environment (add as necessary)
 venv/
 virtualenv/
@@ -23,3 +25,5 @@ build/
 
 # IDE-related, add as necessary
 .vscode/
+.idea
+
