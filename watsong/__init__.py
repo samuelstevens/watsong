@@ -2,10 +2,12 @@ import os
 
 from flask import Flask, redirect, url_for
 
-from . import jukebox
+import jukebox
+
+from typing import Optional, Any
 
 
-def create_app(test_config=None) -> Flask:
+def create_app(test_config: Optional[Any] = None) -> Flask:
     """
     Creates and configures the app. Flask uses this as the entry point.
     """
@@ -26,7 +28,7 @@ def create_app(test_config=None) -> Flask:
     app.register_blueprint(jukebox.bp)
 
     @app.route("/")
-    def index():
+    def index() -> Any:
         """
         Redirect index to /jukebox
         """

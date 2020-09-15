@@ -4,7 +4,11 @@ It also includes some generic types that can be used for error handling, such as
 """
 
 
-from typing import NamedTuple, List, Tuple, TypeVar, Optional
+from typing import NamedTuple, List, Tuple, TypeVar, Optional, TypedDict
+
+
+class Song(TypedDict):
+    title: str
 
 
 """
@@ -20,7 +24,10 @@ print(good_song[0]) # -> House of the Rising Sun
 
 By importing NamedTuple instead of namedtuple, we get type checking for free.
 """
-Song = NamedTuple("Song", [("title", str)])
+
+AlbumDescription = NamedTuple(
+    "AlbumDescription", [("title", str), ("artists", List[str])]
+)
 
 Album = NamedTuple(
     "Album",
