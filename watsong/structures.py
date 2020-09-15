@@ -3,7 +3,11 @@ This file defines application-level types, such as a "Song" or an "Album". It al
 """
 
 
-from typing import NamedTuple, List, Tuple, TypeVar, Optional
+from typing import NamedTuple, List, Tuple, TypeVar, Optional, TypedDict
+
+
+class Song(TypedDict):
+    title: str
 
 
 """
@@ -18,7 +22,6 @@ print(good_song[0]) # -> House of the Rising Sun
 
 By importing NamedTuple instead of namedtuple, we get type checking for free.
 """
-Song = NamedTuple("Song", [("title", str)])
 
 Album = NamedTuple(
     "Album",

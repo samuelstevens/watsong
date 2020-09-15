@@ -13,26 +13,11 @@ def get_songs(albums: List[Album]) -> Result[List[Song]]:
     """
     # some hardcoded results
     songs = [
-        {
-            "song": "Under the Boardwalk",
-            "album": "Under the Boardwalk",
-            "artist": "The Drifters",
-        },
-        {
-            "song": "What's Love Got to Do with It",
-            "album": "Private Dancer",
-            "artist": "Tina Turner",
-        },
-        {
-            "song": "This Is The Life",
-            "album": "This Is The Life",
-            "artist": "Amy Macdonald",
-        },
-        {
-            "song": "I'll Wait",
-            "album": "Golden Hour",
-            "artist": "Sasha Sloan, Kygo",
-        },
+        Song(title="Under the Boardwalk"),
+        Song(title="What's Love Got to Do with It"),
+        Song(title="This Is The Life"),
+        Song(title="I'll Wait"),
+        Song(title="Under the Boardwalk"),
     ]
 
     return songs, None
