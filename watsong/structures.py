@@ -3,7 +3,12 @@ This file defines application-level types, such as a "Song" or an "Album". It al
 """
 
 
-from typing import NamedTuple, List, Tuple, TypeVar, Optional, TypedDict
+from typing import NamedTuple, List, Tuple, TypeVar, Optional
+
+try:
+    from typing import TypedDict
+except ImportError:
+    from typing_extensions import TypedDict
 
 
 class Song(TypedDict):
