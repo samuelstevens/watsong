@@ -6,17 +6,20 @@ from flask import Blueprint, render_template, request, jsonify, session
 
 from . import watson, spotify
 
+from .structures import Song
+from typing import List, Any
+
 bp = Blueprint("jukebox", __name__, url_prefix="/jukebox")
 
 DIALS = ["energy", "lyrics", "dance", "melody"]
 
 
 @bp.route("/", methods=["GET", "POST"])
-def jukebox():
+def jukebox() -> Any:
     """
     Renders the empty jukebox page.
     """
-    songs = []
+    songs: List[Song] = []
 
     if request.method == "POST":
         query = request.form["query"]
