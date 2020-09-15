@@ -1,0 +1,25 @@
+# whatever you call your virtual environment (add as necessary)
+venv/
+virtualenv/
+
+# compiled python files
+*.pyc
+__pycache__/
+
+instance/
+
+# test results
+.pytest_cache/
+.coverage
+htmlcov/
+
+# build-related
+dist/
+build/
+*.egg-info/
+
+# other caches
+.mypy_cache/
+
+# IDE-related, add as necessary
+.vscode/

@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block header %}
+<h1>{% block title %}Watsong{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+<div id="prompt">
+  <form action={{ url_for('jukebox.jukebox') }} method="post">
+    <p>What are you looking for?</p>
+    <input type="text" placeholder="Beach tunes for 4th of July" name="query">
+    <input type="submit" />
+  </form>
+</div>
+<h2>Songs</h2>
+<button onclick="showPlaylist()">Show on Spotify</button>
+<div id="playlist">
+  {% for song in songs %}
+    <div class="song">
+      <p class="title">{{ song['song'] }}</p>
+      <p class="artist">{{ song['artist'] }}</p>
+    </div>
+  {% endfor %}
+</div>
+<div id="dials">
+  {% for dial in dials %}
+    <div class="dial" id="energy">
+      <p>|</p>
+      
+      <div>
+        <img style="transform: rotate(5.79061rad);" src="{{ url_for('static', filename='images/dial.png') }}" />
+      </div>
+      
+      <span>{{ dial.lower().capitalize() }}</span>
+    </div>
+  {% endfor %}
+</div>
+
+<script src="{{ url_for('static', filename = 'js/draggable.js') }}"></script>
+    
+{% endblock %}
