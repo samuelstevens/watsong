@@ -1,4 +1,4 @@
-name: CI
+name: Typechecking and linting
 
 on:
   pull_request:
