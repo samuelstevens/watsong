@@ -1,1 +1,1 @@
-var="poorly formatted python"
+var = "poorly formatted python"
