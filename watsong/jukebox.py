@@ -8,6 +8,9 @@ import watson, spotify
 from structures import Song
 from typing import Any, List
 
+from .structures import Song
+from typing import List, Any
+
 bp = Blueprint("jukebox", __name__, url_prefix="/jukebox")
 
 DIALS = ["energy", "lyrics", "dance", "melody"]
