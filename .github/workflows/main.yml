@@ -3,7 +3,7 @@ name: Watsong
 on:
   push:
     branches: [$default-branch]
-  pull_request:
+  pull_request
 
 jobs:
   build:
