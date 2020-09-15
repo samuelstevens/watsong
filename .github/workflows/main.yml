@@ -1,4 +1,4 @@
-name: Watsong
+name: CI
 
 on:
   push:
