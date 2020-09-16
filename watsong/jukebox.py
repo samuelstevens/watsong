@@ -4,8 +4,8 @@ This is the main controller (called blueprints in Flask) for the application.
 
 from flask import Blueprint, render_template, request, jsonify, session
 
-import watson, spotify
-from structures import Song
+from . import watson, spotify
+from .structures import Song
 from typing import Any, List
 
 bp = Blueprint("jukebox", __name__, url_prefix="/jukebox")

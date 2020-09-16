@@ -1,5 +1,5 @@
 #!/bin/env bash
-export FLASK_APP=watsong
+export FLASK_APP=watsong.webapp
 export FLASK_ENV=development
 export SECRET_KEY=dev
 export SPOTIPY_CLIENT_ID="5d141ce6f09c4fbfa12d16ce9e5d40c1"

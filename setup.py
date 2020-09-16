@@ -1,9 +1,9 @@
-from setuptools import find_packages, setup
+from distutils.core import setup
 
 setup(
     name="watsong",
     version="1.0.0",
-    packages=find_packages(),
+    packages=["watsong"],
     include_package_data=True,
     zip_safe=False,
     install_requires=[

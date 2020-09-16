@@ -2,7 +2,7 @@
 This file is a starter for whatever Spotify stuff needs to happen
 """
 from typing import List, Optional
-from structures import Album, Song, Result, AlbumDescription
+from .structures import Album, Song, Result, AlbumDescription
 
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials

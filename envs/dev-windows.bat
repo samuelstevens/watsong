@@ -1,4 +1,4 @@
-set FLASK_APP=watsong
+set FLASK_APP=watsong.webapp
 set FLASK_ENV=development
 set SECRET_KEY=dev
 set SPOTIPY_CLIENT_ID="5d141ce6f09c4fbfa12d16ce9e5d40c1"
