@@ -4,10 +4,9 @@ This is the main controller (called blueprints in Flask) for the application.
 
 from flask import Blueprint, render_template, request, jsonify, session
 
-from . import watson, spotify
-
-from .structures import Song
-from typing import List, Any
+import watson, spotify
+from structures import Song
+from typing import Any, List
 
 bp = Blueprint("jukebox", __name__, url_prefix="/jukebox")
 
@@ -27,12 +26,12 @@ def jukebox() -> Any:
         print(query)
 
         if query:
-            albums, err = watson.get_albums(query)
+            album_descs, err = watson.get_albums(query)
 
             if err is not None:
                 return jsonify({"error": str(err)})
 
-            songs, err = spotify.get_songs(albums)
+            songs, err = spotify.get_songs(album_descs)
 
             if err is not None:
                 return jsonify({"error": str(err)})

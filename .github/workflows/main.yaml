@@ -1,10 +1,10 @@
-name: CI
+name: Typechecking and linting
 
 on:
   push:
-    branches: [$default-branch]
+    branches: [master]
   pull_request:
-    branches: [$default-branch]
+    branches: [master]
 
 jobs:
   build:
@@ -15,7 +15,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:

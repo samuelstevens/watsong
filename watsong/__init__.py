@@ -2,7 +2,7 @@ import os
 
 from flask import Flask, redirect, url_for
 
-from . import jukebox
+import jukebox
 
 from typing import Optional, Any
 

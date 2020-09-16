@@ -1,5 +1,6 @@
 """
-This file defines application-level types, such as a "Song" or an "Album". It also includes some generic types that can be used for error handling, such as Result.
+This file defines application-level types, such as a "Song" or an "Album".
+It also includes some generic types that can be used for error handling, such as Result.
 """
 
 
@@ -12,7 +13,8 @@ class Song(TypedDict):
 
 
 """
-Named tuples like a normal python tuple, but the attributes can be accessed via . notation. So this Song could be used like this:
+Named tuples like a normal python tuple, but the attributes can be accessed via . notation.
+So this Song could be used like this:
 
 ```python
 good_song = Song("House of the Rising Sun")
@@ -23,6 +25,10 @@ print(good_song[0]) # -> House of the Rising Sun
 
 By importing NamedTuple instead of namedtuple, we get type checking for free.
 """
+
+AlbumDescription = NamedTuple(
+    "AlbumDescription", [("title", str), ("artists", List[str])]
+)
 
 Album = NamedTuple(
     "Album",
@@ -39,7 +45,9 @@ Album = NamedTuple(
 T = TypeVar("T")
 
 """
-Result is now a generic type that can be used with other types. For example, Result[int] is a Tuple with an int and a possible exception. So if we had a function that returns Result[int], we could get it and use it like this:
+Result is now a generic type that can be used with other types. For example, Result[int]
+is a Tuple with an int and a possible exception. So if we had a function that returns
+Result[int], we could get it and use it like this:
 
 ```python
 myint, error = foo()
