@@ -31,12 +31,15 @@ pip install -r requirements.txt
 2. Activate dev environment
 
 ### macOS
+
 ```sh
 . ./envs/dev-unix.sh
 ```
 
 ### Windows
+
 1. Set up environment variables
+
 ```sh
 .\envs\dev-windows.bat
 ```
@@ -50,3 +53,11 @@ flask run
 4. Open application in browser
 
 [https://localhost:5000/](https://localhost:5000/)
+
+## Running Individual Files as Scripts
+
+Because of the way Flask and `mypy` and all these tools work, to run a file as a script you'll need to do:
+
+```sh
+python -m watsong.spotify # or whatever
+```
