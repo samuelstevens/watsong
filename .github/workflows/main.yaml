@@ -29,4 +29,4 @@ jobs:
           black --check .
       - name: Typecheck with mypy
         run: |
-          mypy --strict
+          mypy --strict -p watsong
