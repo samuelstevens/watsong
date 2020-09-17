@@ -24,12 +24,23 @@ def album_from_title_artist(title: str, artists: List[str]) -> Optional[Album]:
     Return an album
     :return:
     """
-    # TODO Nothing is returned when I also search for artist
-    search_result = sp.search(f"album:{title}", type="album", limit=1)
+    # Set max limit for now...
+    search_result = sp.search(f"album:{title}", type="album", limit=50)
     results = search_result["albums"]["items"]
 
     if len(results) > 0:
-        album_id = results[0]["id"]
+        album_id = None
+
+        # Go through results and find the album with the desired artist
+        for result in results:
+            artist = result["artists"][0]["name"]
+            if artist in artists:
+                album_id = result["id"]
+                break
+
+        if album_id is None:
+            album_id = results[0]["id"]
+
         tracks = sp.album_tracks(album_id)
         return Album(
             title,
@@ -60,10 +71,24 @@ def get_songs(album_descriptions: List[AlbumDescription]) -> Result[List[Song]]:
     return songs, None
 
 
+# TODO: Create a filter API based on the Feel values
+# Feel = NamedTuple(
+#     "Feel",
+#     [
+#         ("energy", float),
+#         ("lyrics", float),
+#         ("dance", float),
+#         ("melody", float)
+#     ],
+# )
+# def filter_songs(songs: List[Song], feel: Feel) -> List[Song]:
+#     return
+
+
 if __name__ == "__main__":
     album_list = [
         AlbumDescription("A girl between two worlds", ["Fatima Yamaha"]),
-        AlbumDescription("Harder", ["Jax Jones, Bebe Rexha"]),
+        AlbumDescription("Harder", ["Jax Jones", "Bebe Rexha"]),
     ]
     songs, errors = get_songs(album_list)
     print(songs)
