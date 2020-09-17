@@ -31,36 +31,42 @@ def get_reviews(conn: Any) -> Tuple[Tuple[str,str,str]]:
     return cur.fetchall()
 
 def upload_reviews(reviews: Tuple[Tuple[str,str,str]], apikey: str, service_url: str, environment_id: str, collection_id: str, version: str = "2019-04-30") -> None:
-    authenticator = IAMAuthenticator(apikey)
-    discovery = DiscoveryV1(
-        version=version,
-        authenticator=authenticator
-    )
-    discovery.set_service_url(service_url)
+    """
+    Upload reviews to Watson Discovery
+    """
+    try:
+        authenticator = IAMAuthenticator(apikey)
+        discovery = DiscoveryV1(
+            version=version,
+            authenticator=authenticator
+        )
+        discovery.set_service_url(service_url)
 
-    for review in reviews:
-        data = {"title":review[0], "author":review[1], "text":review[2]}
-        fname = review[0] + ".json"
+        for review in reviews:
+            data = {"title":review[0], "author":review[1], "text":review[2]}
+            fname = review[0] + ".json"
 
-        with open(fname,"w+") as fp:
-            json.dump(data, fp)
-            fp.seek(0)
-            add_doc = discovery.add_document(
-                environment_id,
-                collection_id,
-                file = fp).get_result()
-        print(add_doc)
-        os.remove(fname)
+            with open(fname,"w+") as fp:
+                json.dump(data, fp)
+                fp.seek(0)
+                add_doc = discovery.add_document(
+                    environment_id,
+                    collection_id,
+                    file = fp).get_result()
+            print(add_doc)
+            os.remove(fname)
+    except Exception as e:
+        print(e)
     return
 
 
 
 
 def main():
-    database = r"dataset.sqlite"
-    apikey = "L8vZ5k9U8L8r8r9YstxDbOml0imvZBYmj7bB_tiVQ2GS"
+    database = r"./watsong/misc/dataset.sqlite"
+    apikey = os.getenv("DISCOVERY_API_KEY")
     environment_id = "26e276ef-e35e-4076-a190-bab90b5a4521"
-    collection_id = "f9541bb4-22a0-4762-b7bb-c80bf46d1ee2"
+    collection_id = "907ec2e6-da03-4a54-9b75-e34cad8d9c7a"
     service_url = "https://api.us-south.discovery.watson.cloud.ibm.com/instances/230365e2-48ca-4b2f-8a9e-3dba5fbe20ed"
 
 
