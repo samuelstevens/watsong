@@ -8,7 +8,7 @@ from watsong.structures import AlbumDescription
 
 
 class TestSpotify(unittest.TestCase):
-    def test_get_songs_single_artist_many_songs(self):
+    def test_get_songs_single_artist_many_songs(self) -> None:
         album_list = [
             AlbumDescription("A girl between two worlds", ["Fatima Yamaha"]),
         ]
@@ -18,7 +18,7 @@ class TestSpotify(unittest.TestCase):
         self.assertEqual(len(songs), 7)
         self.assertIsNone(errors)
 
-    def test_get_songs_multi_artist_one_song(self):
+    def test_get_songs_multi_artist_one_song(self) -> None:
         album_list = [
             AlbumDescription("Harder", ["Jax Jones", "Bebe Rexha"]),
         ]
