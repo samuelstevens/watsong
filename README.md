@@ -61,3 +61,17 @@ Because of the way Flask and `mypy` and all these tools work, to run a file as a
 ```sh
 python -m watsong.spotify # or whatever
 ```
+
+## Running the unit tests
+To run unit tests for the python code 
+(runs all tests in the test/ subdirectory with name test_*.py)
+```bash
+python -m unittest
+```
+
+## Contributing
+Make sure your commits are linted with black by running
+```bash
+black .
+```
+in the top level directory
