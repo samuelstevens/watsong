@@ -31,4 +31,5 @@ jobs:
         run: |
           mypy --strict -p watsong
       - name: Test python unit tests
+        run: |
           python -m unittest
