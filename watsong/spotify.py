@@ -1,7 +1,7 @@
 """
 This file is a starter for whatever Spotify stuff needs to happen
 """
-from typing import List, Optional
+from typing import List, Optional, Dict
 from .structures import Album, Song, Result, AlbumDescription, Feel
 
 import spotipy
@@ -51,7 +51,7 @@ def album_from_title_artist(title: str, artists: List[str]) -> Optional[Album]:
             artists,
             # You can get more stuff like the song id if you want to...
             # https://developer.spotify.com/documentation/web-api/reference/albums/get-albums-tracks/
-            [Song(title=item["name"], uri=item["uri"]) for item in tracks["items"]],
+            [Song(title=item["name"], uri=item["uri"], features={}) for item in tracks["items"]],
         )
 
     return None
@@ -74,7 +74,7 @@ def get_songs(album_descriptions: List[AlbumDescription]) -> Result[List[Song]]:
     return songs, None
 
 
-def add_audio_features(songs: List[Song]):
+def add_audio_features(songs: List[Song]) -> None:
     song_links = []
     for song in songs:
         song_links.append(song["uri"])
@@ -94,6 +94,8 @@ def add_audio_features(songs: List[Song]):
 
         song = songs[song_index]
         song["features"] = feel
+
+    return
 
 
 # TODO: Create a filter API based on the Feel values
@@ -118,11 +120,12 @@ def filter_songs(song: Song) -> bool:
     return hasEnergy and hasDanceability and hasLyrics and hasMelody
 
 
-def printSongs(songs: List[Song]):
+def printSongs(songs: List[Song]) -> None:
     for song in songs:
         print(song)
         print()
 
+    return
 
 if __name__ == "__main__":
     print("Running Spotify.py")
