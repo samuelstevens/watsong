@@ -10,6 +10,8 @@ from typing_extensions import TypedDict  # because we support 3.6.5
 
 class Song(TypedDict):
     title: str
+    uri: str
+    features: dict
 
 
 """
@@ -37,6 +39,16 @@ Album = NamedTuple(
         ("spotify_id", str),
         ("artists", List[str]),
         ("songs", List[Song]),
+    ],
+)
+
+Feel = NamedTuple(
+    "Feel",
+    [
+        ("energy", float),
+        ("lyrics", float),
+        ("dance", float),
+        ("melody", float)
     ],
 )
 

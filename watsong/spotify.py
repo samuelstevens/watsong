@@ -2,7 +2,7 @@
 This file is a starter for whatever Spotify stuff needs to happen
 """
 from typing import List, Optional
-from .structures import Album, Song, Result, AlbumDescription
+from .structures import Album, Song, Result, AlbumDescription, Feel
 
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
@@ -18,6 +18,8 @@ sp = spotipy.Spotify(
     )
 )
 
+# TODO: We need to discuss how we want to get this Feel object (can't be a filter param)
+mock_feel = Feel(0.5, 0, 0.75, 0)
 
 def album_from_title_artist(title: str, artists: List[str]) -> Optional[Album]:
     """
@@ -48,7 +50,7 @@ def album_from_title_artist(title: str, artists: List[str]) -> Optional[Album]:
             artists,
             # You can get more stuff like the song id if you want to...
             # https://developer.spotify.com/documentation/web-api/reference/albums/get-albums-tracks/
-            [Song(title=item["name"]) for item in tracks["items"]],
+            [Song(title=item["name"], uri=item["uri"]) for item in tracks["items"]],
         )
 
     return None
@@ -70,19 +72,53 @@ def get_songs(album_descriptions: List[AlbumDescription]) -> Result[List[Song]]:
 
     return songs, None
 
+def add_audio_features(songs: List[Song]):
+    song_links = []
+    for song in songs:
+        song_links.append(song["uri"])
+
+    feature_list = sp.audio_features(song_links)
+
+    for feature in feature_list:
+        song_index = feature_list.index(feature)
+        feel = {
+            "energy": feature["energy"],
+            "dance": feature["danceability"],
+            # TODO: We need to discuss what values from the Spotify json
+            # TODO: that we want to use for the lyrics and melody.
+            "lyrics": 0,
+            "melody": 0
+        }
+
+        song = songs[song_index]
+        song["features"] = feel
+
 
 # TODO: Create a filter API based on the Feel values
-# Feel = NamedTuple(
-#     "Feel",
-#     [
-#         ("energy", float),
-#         ("lyrics", float),
-#         ("dance", float),
-#         ("melody", float)
-#     ],
-# )
-# def filter_songs(songs: List[Song], feel: Feel) -> List[Song]:
-#     return
+def filter_songs(song: Song) -> bool:
+    hasEnergy = False
+    hasDanceability = False
+    hasLyrics = False
+    hasMelody = False
+
+    if (song["features"]["energy"] >= mock_feel.energy):
+        hasEnergy = True
+
+    if (song["features"]["dance"] >= mock_feel.dance):
+        hasDanceability = True
+
+    if (song["features"]["lyrics"] >= mock_feel.lyrics):
+        hasLyrics = True
+
+    if (song["features"]["melody"] >= mock_feel.melody):
+        hasMelody = True
+
+    return hasEnergy and hasDanceability and hasLyrics and hasMelody
+
+def printSongs(songs: List[Song]):
+    for song in songs:
+        print(song)
+        print()
 
 
 if __name__ == "__main__":
@@ -90,5 +126,14 @@ if __name__ == "__main__":
         AlbumDescription("A girl between two worlds", ["Fatima Yamaha"]),
         AlbumDescription("Harder", ["Jax Jones", "Bebe Rexha"]),
     ]
+
     songs, errors = get_songs(album_list)
-    print(songs)
+    add_audio_features(songs)
+
+    printSongs(songs)
+
+    # Filter out songs that don't meet
+    songs = filter(filter_songs, songs)
+
+    print("AFTER FILTER")
+    printSongs(songs)
