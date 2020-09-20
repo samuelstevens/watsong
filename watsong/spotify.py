@@ -21,6 +21,7 @@ sp = spotipy.Spotify(
 # TODO: We need to discuss how we want to get this Feel object (can't be a filter param)
 mock_feel = Feel(0.5, 0, 0.75, 0)
 
+
 def album_from_title_artist(title: str, artists: List[str]) -> Optional[Album]:
     """
     Return an album
@@ -72,6 +73,7 @@ def get_songs(album_descriptions: List[AlbumDescription]) -> Result[List[Song]]:
 
     return songs, None
 
+
 def add_audio_features(songs: List[Song]):
     song_links = []
     for song in songs:
@@ -87,7 +89,7 @@ def add_audio_features(songs: List[Song]):
             # TODO: We need to discuss what values from the Spotify json
             # TODO: that we want to use for the lyrics and melody.
             "lyrics": 0,
-            "melody": 0
+            "melody": 0,
         }
 
         song = songs[song_index]
@@ -101,24 +103,26 @@ def filter_songs(song: Song) -> bool:
     hasLyrics = False
     hasMelody = False
 
-    if (song["features"]["energy"] >= mock_feel.energy):
+    if song["features"]["energy"] >= mock_feel.energy:
         hasEnergy = True
 
-    if (song["features"]["dance"] >= mock_feel.dance):
+    if song["features"]["dance"] >= mock_feel.dance:
         hasDanceability = True
 
-    if (song["features"]["lyrics"] >= mock_feel.lyrics):
+    if song["features"]["lyrics"] >= mock_feel.lyrics:
         hasLyrics = True
 
-    if (song["features"]["melody"] >= mock_feel.melody):
+    if song["features"]["melody"] >= mock_feel.melody:
         hasMelody = True
 
     return hasEnergy and hasDanceability and hasLyrics and hasMelody
+
 
 def printSongs(songs: List[Song]):
     for song in songs:
         print(song)
         print()
+
 
 if __name__ == "__main__":
     print("Running Spotify.py")
