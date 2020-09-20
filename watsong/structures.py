@@ -1,4 +1,5 @@
 from typing import Dict
+
 """
 This file defines application-level types, such as a "Song" or an "Album".
 It also includes some generic types that can be used for error handling, such as Result.

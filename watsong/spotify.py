@@ -51,7 +51,10 @@ def album_from_title_artist(title: str, artists: List[str]) -> Optional[Album]:
             artists,
             # You can get more stuff like the song id if you want to...
             # https://developer.spotify.com/documentation/web-api/reference/albums/get-albums-tracks/
-            [Song(title=item["name"], uri=item["uri"], features={}) for item in tracks["items"]],
+            [
+                Song(title=item["name"], uri=item["uri"], features={})
+                for item in tracks["items"]
+            ],
         )
 
     return None
@@ -126,6 +129,7 @@ def printSongs(songs: List[Song]) -> None:
         print()
 
     return
+
 
 if __name__ == "__main__":
     print("Running Spotify.py")
