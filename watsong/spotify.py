@@ -120,20 +120,5 @@ def printSongs(songs: List[Song]):
         print(song)
         print()
 
-
 if __name__ == "__main__":
-    album_list = [
-        AlbumDescription("A girl between two worlds", ["Fatima Yamaha"]),
-        AlbumDescription("Harder", ["Jax Jones", "Bebe Rexha"]),
-    ]
-
-    songs, errors = get_songs(album_list)
-    add_audio_features(songs)
-
-    printSongs(songs)
-
-    # Filter out songs that don't meet
-    songs = filter(filter_songs, songs)
-
-    print("AFTER FILTER")
-    printSongs(songs)
+    print("Running Spotify.py")
