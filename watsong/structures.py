@@ -1,3 +1,5 @@
+from typing import Dict
+
 """
 This file defines application-level types, such as a "Song" or an "Album".
 It also includes some generic types that can be used for error handling, such as Result.
@@ -9,6 +11,8 @@ from typing_extensions import TypedDict  # because we support 3.6.5
 
 class Song(TypedDict):
     title: str
+    uri: str
+    features: Dict[str, float]
 
 
 """
@@ -38,6 +42,12 @@ Album = NamedTuple(
         ("songs", List[Song]),
     ],
 )
+
+Feel = NamedTuple(
+    "Feel",
+    [("energy", float), ("lyrics", float), ("dance", float), ("melody", float)],
+)
+
 
 # This is a generic type variable, like T in Java generics. Python makes us define it ourselves.
 T = TypeVar("T")

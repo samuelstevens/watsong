@@ -74,4 +74,10 @@ Make sure your commits are linted with black by running
 ```bash
 black .
 ```
-in the top level directory
+in the top level directory.
+
+Also run
+```bash
+mypy --strict -p watsong
+```
+to detect any issues thrown by numpy.
