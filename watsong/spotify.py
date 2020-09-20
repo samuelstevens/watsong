@@ -72,23 +72,9 @@ def get_songs(album_descriptions: List[AlbumDescription]) -> Result[List[Song]]:
 
 
 # TODO: Create a filter API based on the Feel values
-# Feel = NamedTuple(
-#     "Feel",
-#     [
-#         ("energy", float),
-#         ("lyrics", float),
-#         ("dance", float),
-#         ("melody", float)
-#     ],
-# )
 # def filter_songs(songs: List[Song], feel: Feel) -> List[Song]:
 #     return
 
 
 if __name__ == "__main__":
-    album_list = [
-        AlbumDescription("A girl between two worlds", ["Fatima Yamaha"]),
-        AlbumDescription("Harder", ["Jax Jones", "Bebe Rexha"]),
-    ]
-    songs, errors = get_songs(album_list)
-    print(songs)
+    print("Running Spotify.py")
