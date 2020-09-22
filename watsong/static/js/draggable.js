@@ -65,6 +65,16 @@ function makeElemTwistable(elem) {
     document.ontouchmove = null;
 
     prevAngle = -currentAngle;
+
+    $.getJSON($SCRIPT_ROOT + '/jukebox/filter', {
+      // TODO: actuall get these valuess
+      dance: 0.5,
+      energy: 0.5,
+      lyrics: 0.5,
+      valence: 0.5
+    }, function (data) {
+      console.log(data);
+    });
   }
 }
 

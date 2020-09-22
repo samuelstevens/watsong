@@ -1,12 +1,10 @@
 import os
+from importlib import import_module
+from typing import Any, Optional
 
 from flask import Flask, redirect, url_for
-from importlib import import_module
-
 
 from . import jukebox
-
-from typing import Optional, Any
 
 
 def create_app(test_config: Optional[Any] = None) -> Flask:

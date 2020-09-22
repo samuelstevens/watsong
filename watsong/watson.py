@@ -11,4 +11,7 @@ def get_albums(query: str) -> Result[List[AlbumDescription]]:
     """
     Given a natural language query, use watson to return the best albums for that query.
     """
-    return [], None
+    return [
+        AlbumDescription("Daytona", ["Pusha T"]),
+        AlbumDescription("My Beautiful Dark Twisted Fantasy", ["Kanye West"]),
+    ], None

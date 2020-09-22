@@ -1,11 +1,12 @@
 """
 This file is a starter for whatever Spotify stuff needs to happen
 """
-from typing import List, Optional, Dict
-from .structures import Album, Song, Result, AlbumDescription, Feel
+from typing import Dict, List, Optional
 
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
+
+from .structures import Album, AlbumDescription, Feel, Result, Song
 
 # Authenticate with spotify using the client credientials flow.
 # We can then access the spotify API, so long as we don't need
@@ -102,22 +103,22 @@ def add_audio_features(songs: List[Song]) -> None:
 
 
 # TODO: Create a filter API based on the Feel values
-def filter_songs(song: Song) -> bool:
+def filter_songs(feel: Feel, song: Song) -> bool:
     hasEnergy = False
     hasDanceability = False
     hasLyrics = False
     hasMelody = False
 
-    if song["features"]["energy"] >= mock_feel.energy:
+    if song["features"]["energy"] >= feel.energy:
         hasEnergy = True
 
-    if song["features"]["dance"] >= mock_feel.dance:
+    if song["features"]["dance"] >= feel.dance:
         hasDanceability = True
 
-    if song["features"]["lyrics"] >= mock_feel.lyrics:
+    if song["features"]["lyrics"] >= feel.lyrics:
         hasLyrics = True
 
-    if song["features"]["melody"] >= mock_feel.melody:
+    if song["features"]["melody"] >= feel.melody:
         hasMelody = True
 
     return hasEnergy and hasDanceability and hasLyrics and hasMelody

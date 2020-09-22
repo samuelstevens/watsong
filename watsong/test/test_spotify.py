@@ -1,9 +1,9 @@
-import unittest
 import sys
+import unittest
 
 sys.path.append("..")  # Adds higher directory to python modules path.
 
-from watsong.spotify import get_songs, add_audio_features
+from watsong.spotify import add_audio_features, get_songs
 from watsong.structures import AlbumDescription
 
 
