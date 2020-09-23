@@ -5,7 +5,7 @@ This file is a starter for any Watson stuff that needs to happen.
 import os
 import json
 from typing import List
-from .structures import AlbumDescription, Result  # type: ignore
+from .structures import AlbumDescription, Result
 
 from ibm_watson import DiscoveryV1  # type: ignore
 from ibm_cloud_sdk_core.authenticators import IAMAuthenticator  # type: ignore
