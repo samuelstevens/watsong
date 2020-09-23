@@ -32,13 +32,17 @@ class TestSpotify(unittest.TestCase):
         songs, errors = get_songs(album_list)
         add_audio_features(songs)
 
-        # TODO: Change lyrics and melody values when making those additionsblack
         self.assertEqual(
             songs[0],
             {
                 "title": "Between Worlds",
                 "uri": "spotify:track:0Vpdt3FsW8m7nC4FDk3rfw",
-                "features": {"energy": 0.611, "dance": 0.75, "lyrics": 0, "melody": 0},
+                "features": {
+                    "energy": 0.611,
+                    "dance": 0.75,
+                    "lyrics": 0.0538,
+                    "valence": 0.546,
+                },
             },
         )
         self.assertEqual(len(songs), 7)
@@ -59,6 +63,8 @@ class TestSpotify(unittest.TestCase):
             },
         )
         self.assertEqual(len(songs), 1)
+
+    # TODO: Once Sam finalizes the filter songs API, unit tests need to be made for it
 
 
 if __name__ == "__main__":
