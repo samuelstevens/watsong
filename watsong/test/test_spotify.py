@@ -3,7 +3,7 @@ import sys
 
 sys.path.append("..")  # Adds higher directory to python modules path.
 
-from watsong.spotify import get_songs, add_audio_features
+from watsong.spotify import get_songs, add_audio_features, create_playlist
 from watsong.structures import AlbumDescription
 
 
@@ -59,6 +59,19 @@ class TestSpotify(unittest.TestCase):
             },
         )
         self.assertEqual(len(songs), 1)
+
+    def test_create_playlist(self) -> None:
+        album_list = [
+            AlbumDescription("A girl between two worlds", ["Fatima Yamaha"]),
+        ]
+        songs, errors = get_songs(album_list)
+        link = create_playlist(songs)
+        link2 = create_playlist(songs)
+        # TODO: Change lyrics and melody values when making those additionsblack
+        self.assertEqual(
+            link, link2
+        )
+        self.assertRegex(link, 'https://open.spotify.com/embed/playlist/*')
 
 
 if __name__ == "__main__":

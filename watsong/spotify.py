@@ -1,20 +1,26 @@
 """
 This file is a starter for whatever Spotify stuff needs to happen
 """
-from typing import List, Optional, Dict
+from typing import List, Optional
 from .structures import Album, Song, Result, AlbumDescription, Feel
 
 import spotipy
-from spotipy.oauth2 import SpotifyClientCredentials
+from spotipy.oauth2 import SpotifyOAuth
 
-# Authenticate with spotify using the client credientials flow.
-# We can then access the spotify API, so long as we don't need
-# access to user information.
-# :return:
+# These are also stored in the environment but it's easier to leave them here
+# since it causes some problems in how I run it if I use the envionment variables
+CLIENT_ID = '5d141ce6f09c4fbfa12d16ce9e5d40c1'
+CLIENT_SECRET = '52fed0d6564a4e6f8e596b78bd1abf62'
+USERNAME = 'mo8wax9tenoczvhquxllzca37'
+
+# If it doesn't work, try deleting the .cache file... will look for a more consistent solution
+# later. Actually it tends to work and just give an error message so it's not that bad.
 sp = spotipy.Spotify(
-    auth_manager=SpotifyClientCredentials(
-        client_id="5d141ce6f09c4fbfa12d16ce9e5d40c1",
-        client_secret="52fed0d6564a4e6f8e596b78bd1abf62",
+    auth_manager=SpotifyOAuth(
+        client_id=CLIENT_ID,
+        client_secret=CLIENT_SECRET,
+        redirect_uri='http://localhost:8888/callback',
+        scope='playlist-modify-public playlist-modify-private',
     )
 )
 
@@ -28,21 +34,21 @@ def album_from_title_artist(title: str, artists: List[str]) -> Optional[Album]:
     :return:
     """
     # Set max limit for now...
-    search_result = sp.search(f"album:{title}", type="album", limit=50)
-    results = search_result["albums"]["items"]
+    search_result = sp.search(f'album:{title}', type='album', limit=50)
+    results = search_result['albums']['items']
 
     if len(results) > 0:
         album_id = None
 
         # Go through results and find the album with the desired artist
         for result in results:
-            artist = result["artists"][0]["name"]
+            artist = result['artists'][0]['name']
             if artist in artists:
-                album_id = result["id"]
+                album_id = result['id']
                 break
 
         if album_id is None:
-            album_id = results[0]["id"]
+            album_id = results[0]['id']
 
         tracks = sp.album_tracks(album_id)
         return Album(
@@ -52,8 +58,8 @@ def album_from_title_artist(title: str, artists: List[str]) -> Optional[Album]:
             # You can get more stuff like the song id if you want to...
             # https://developer.spotify.com/documentation/web-api/reference/albums/get-albums-tracks/
             [
-                Song(title=item["name"], uri=item["uri"], features={})
-                for item in tracks["items"]
+                Song(title=item['name'], uri=item['uri'], features={})
+                for item in tracks['items']
             ],
         )
 
@@ -80,23 +86,23 @@ def get_songs(album_descriptions: List[AlbumDescription]) -> Result[List[Song]]:
 def add_audio_features(songs: List[Song]) -> None:
     song_links = []
     for song in songs:
-        song_links.append(song["uri"])
+        song_links.append(song['uri'])
 
     feature_list = sp.audio_features(song_links)
 
     for feature in feature_list:
         song_index = feature_list.index(feature)
         feel = {
-            "energy": feature["energy"],
-            "dance": feature["danceability"],
+            'energy': feature['energy'],
+            'dance': feature['danceability'],
             # TODO: We need to discuss what values from the Spotify json
             # TODO: that we want to use for the lyrics and melody.
-            "lyrics": 0,
-            "melody": 0,
+            'lyrics': 0,
+            'melody': 0,
         }
 
         song = songs[song_index]
-        song["features"] = feel
+        song['features'] = feel
 
     return
 
@@ -108,28 +114,49 @@ def filter_songs(song: Song) -> bool:
     hasLyrics = False
     hasMelody = False
 
-    if song["features"]["energy"] >= mock_feel.energy:
+    if song['features']['energy'] >= mock_feel.energy:
         hasEnergy = True
 
-    if song["features"]["dance"] >= mock_feel.dance:
+    if song['features']['dance'] >= mock_feel.dance:
         hasDanceability = True
 
-    if song["features"]["lyrics"] >= mock_feel.lyrics:
+    if song['features']['lyrics'] >= mock_feel.lyrics:
         hasLyrics = True
 
-    if song["features"]["melody"] >= mock_feel.melody:
+    if song['features']['melody'] >= mock_feel.melody:
         hasMelody = True
 
     return hasEnergy and hasDanceability and hasLyrics and hasMelody
 
 
-def printSongs(songs: List[Song]) -> None:
+def create_playlist(songs: List[Song]) -> str:
+    # Find the watsong playlist and use it if possible
+    playlists = sp.current_user_playlists()
+    watsong_list = [playlist for playlist in playlists['items'] if playlist['name'] == 'Watsong Playlist']
+    if len(watsong_list):
+        # Get the first playlist named 'Watsong Playlist'
+        playlist = watsong_list[0]
+        # Clear it
+
+    else:
+        # If we can't find it, create a new one.
+        playlist = sp.user_playlist_create(USERNAME, 'Watsong Playlist', public=True,
+                                           collaborative=False, description='A playlist created by watsong just for you')
+    sp.playlist_replace_items(playlist['id'], [song['uri'] for song in songs])
+    return f'https://open.spotify.com/embed/playlist/{playlist["id"]}'
+
+
+def print_songs(songs: List[Song]) -> None:
     for song in songs:
         print(song)
         print()
-
     return
 
 
-if __name__ == "__main__":
-    print("Running Spotify.py")
+if __name__ == '__main__':
+    album_list = [
+        AlbumDescription('A girl between two worlds', ['Fatima Yamaha']),
+    ]
+    songs, errors = get_songs(album_list)
+    x = create_playlist(songs)
+    print(x)
