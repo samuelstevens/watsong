@@ -72,10 +72,8 @@ class TestSpotify(unittest.TestCase):
         link = create_playlist(songs)
         link2 = create_playlist(songs)
         # TODO: Change lyrics and melody values when making those additionsblack
-        self.assertEqual(
-            link, link2
-        )
-        self.assertRegex(link, 'https://open.spotify.com/embed/playlist/*')
+        self.assertEqual(link, link2)
+        self.assertRegex(link, "https://open.spotify.com/embed/playlist/*")
 
     # TODO: Once Sam finalizes the filter songs API, unit tests need to be made for it
 
