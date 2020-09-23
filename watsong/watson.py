@@ -21,6 +21,7 @@ authenticator = IAMAuthenticator(apikey)
 discovery = DiscoveryV1(version=version, authenticator=authenticator)
 discovery.set_service_url(service_url)
 
+
 def get_albums(query: str) -> Result[List[AlbumDescription]]:
     """
     Given a natural language query, use watson to return the best albums for that query.
@@ -31,10 +32,17 @@ def get_albums(query: str) -> Result[List[AlbumDescription]]:
     error = None
 
     try:
-        response = discovery.query(environment_id, collection_id, natural_language_query=query, count=count, return_=reqd_fields, x_watson_logging_opt_out=True)
+        response = discovery.query(
+            environment_id,
+            collection_id,
+            natural_language_query=query,
+            count=count,
+            return_=reqd_fields,
+            x_watson_logging_opt_out=True,
+        )
         results = response.get_result()
         for result in results["results"]:
-            album_desc = AlbumDescription(result["title"],result["author"].split(", "))
+            album_desc = AlbumDescription(result["title"], result["author"].split(", "))
             albums.append(album_desc)
     except Exception as e:
         error = e
