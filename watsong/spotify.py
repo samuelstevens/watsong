@@ -89,10 +89,8 @@ def add_audio_features(songs: List[Song]) -> None:
         feel = {
             "energy": feature["energy"],
             "dance": feature["danceability"],
-            # TODO: We need to discuss what values from the Spotify json
-            # TODO: that we want to use for the lyrics and melody.
-            "lyrics": 0,
-            "melody": 0,
+            "lyrics": feature["speechiness"],
+            "valence": feature["valence"],
         }
 
         song = songs[song_index]
@@ -101,7 +99,6 @@ def add_audio_features(songs: List[Song]) -> None:
     return
 
 
-# TODO: Create a filter API based on the Feel values
 def filter_songs(song: Song) -> bool:
     hasEnergy = False
     hasDanceability = False
@@ -117,7 +114,7 @@ def filter_songs(song: Song) -> bool:
     if song["features"]["lyrics"] >= mock_feel.lyrics:
         hasLyrics = True
 
-    if song["features"]["melody"] >= mock_feel.melody:
+    if song["features"]["valence"] >= mock_feel.valence:
         hasMelody = True
 
     return hasEnergy and hasDanceability and hasLyrics and hasMelody
