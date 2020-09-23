@@ -45,7 +45,7 @@ Album = NamedTuple(
 
 Feel = NamedTuple(
     "Feel",
-    [("energy", float), ("lyrics", float), ("dance", float), ("melody", float)],
+    [("energy", float), ("lyrics", float), ("dance", float), ("valence", float)],
 )
 
 
