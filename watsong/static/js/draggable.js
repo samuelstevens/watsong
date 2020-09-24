@@ -1,9 +1,20 @@
+/**
+ * getCenter returns the center of an HTML element in x-y coordinates.
+ *
+ * @param {HTMLElement} elem element to find the center of
+ * @return {{x: number, y: number}} center of elem in as object with .x and .y
+ */
 function getCenter(elem) {
   const { top, left, width } = elem.getBoundingClientRect();
-  // return { y: top, x: left };
   return { y: top + width / 2, x: left + width / 2 };
 }
 
+/**
+ *  getCoord returns the position of a touch or click event
+ *
+ * @param event touch/mouse event
+ * @return {{x: number, y: number}} position of touch or click with .x and .y
+ */
 function getCoord(event) {
   if (event.clientX && event.clientY) {
     return { x: event.clientX, y: event.clientY };
@@ -17,18 +28,26 @@ function getCoord(event) {
   }
 }
 
-
-function makeElemTwistable(elem) {
+/**
+ * initializeDial makes the DOM element twistable and sends HTTP request when the twisting stops.
+ *
+ * @param {HTMLElement} elem is the `div` element that contains the image.
+ * @param {string} dialName is the dial name to be sent to the backend
+ */
+function initializeDial(elem, dialName) {
   var currentAngle = 0, prevAngle = 0, initialAngle = 0;
 
-  elem.onmousedown = twistStart;
-  elem.ontouchstart = twistStart;
+  elem.onmousedown = onTwistStart;
+  elem.ontouchstart = onTwistStart;
 
   const center = getCenter(elem);
 
-
-
-  function twistStart(event) {
+  /**
+   * onTwistStart is called when a user touches or clicks down on `elem`
+   *
+   * @param {Event} event touch/mouse event
+   */
+  function onTwistStart(event) {
     event = event || window.event;
     event.preventDefault();
 
@@ -36,14 +55,19 @@ function makeElemTwistable(elem) {
 
     initialAngle = Math.atan2(x - center.x, y - center.y);
 
-    document.onmouseup = stopTwisting;
-    document.onmousemove = twistElement;
+    document.onmouseup = onStopTwisting;
+    document.onmousemove = onTwist;
 
-    document.ontouchend = stopTwisting;
-    document.ontouchmove = twistElement;
+    document.ontouchend = onStopTwisting;
+    document.ontouchmove = onTwist;
   }
 
-  function twistElement(event) {
+  /**
+   * onTwist is called when a mouse moves while clicked, or dragged via touch.
+   *
+   * @param {Event} event touch/mouse event
+   */
+  function onTwist(event) {
     event = event || window.event;
     event.preventDefault();
 
@@ -56,7 +80,11 @@ function makeElemTwistable(elem) {
     $(elem).css("transform", `rotate(${currentAngle}rad)`);
   }
 
-  function stopTwisting() {
+
+  /**
+   * onStopTwisting is called when a user lets go of the dial (`elem`)
+   */
+  function onStopTwisting() {
     // stop twisting when mouse button is released
     document.onmouseup = null;
     document.onmousemove = null;
@@ -66,18 +94,17 @@ function makeElemTwistable(elem) {
 
     prevAngle = -currentAngle;
 
+    const level = (1.5 + (currentAngle % (2 * Math.PI)) / (2 * Math.PI)) % 1.0;
+
     $.getJSON($SCRIPT_ROOT + '/jukebox/filter', {
-      // TODO: actuall get these valuess
-      dance: 0.5,
-      energy: 0.5,
-      lyrics: 0.5,
-      valence: 0.5
+      [dialName]: level
     }, function (data) {
       console.log(data);
     });
   }
 }
 
-$.each($('.dial > div'), function (_, elem) {
-  makeElemTwistable(elem);
+$.each($('.dial'), function (_, elem) {
+  const dial = $(elem).children('div')[0];
+  initializeDial(dial, elem.id);
 });

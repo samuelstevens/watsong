@@ -49,8 +49,8 @@ def filter() -> Any:
     """
     Take a request and its songs and filter them according to DIALS
     """
-
-    params = [request.args.get(dial, 0, type=float) for dial in DIALS]
+    print(request.args)
+    params = [request.args.get(dial.lower(), 0, type=float) for dial in DIALS]
 
     print(params)
 
