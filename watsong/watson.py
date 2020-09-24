@@ -3,13 +3,12 @@ This file is a starter for any Watson stuff that needs to happen.
 """
 
 import os
-import json
 from typing import List
-from .structures import AlbumDescription, Result
 
-from ibm_watson import DiscoveryV1  # type: ignore
 from ibm_cloud_sdk_core.authenticators import IAMAuthenticator  # type: ignore
+from ibm_watson import DiscoveryV1  # type: ignore
 
+from .structures import AlbumDescription, Result
 
 apikey = os.getenv("DISCOVERY_API_KEY")
 environment_id = "26e276ef-e35e-4076-a190-bab90b5a4521"
