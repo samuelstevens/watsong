@@ -34,7 +34,7 @@ def album_from_title_artist(title: str, artists: List[str]) -> Optional[Album]:
     :return:
     """
     # Set max limit for now...
-    search_result = sp.search(f"album:{title}", type="album", limit=50)
+    search_result = sp.search(f"{title}", type="album", limit=50)
     results = search_result["albums"]["items"]
 
     if len(results) > 0:
@@ -139,14 +139,13 @@ def create_playlist(songs: List[Song]) -> str:
         # Get the first playlist named 'Watsong Playlist'
         playlist = watsong_list[0]
         # Clear it
-
     else:
         # If we can't find it, create a new one.
         playlist = sp.user_playlist_create(
             USERNAME,
             "Watsong Playlist",
             public=True,
-            collaborative=False,
+            collaborative=True,
             description="A playlist created by watsong just for you",
         )
     sp.playlist_replace_items(playlist["id"], [song["uri"] for song in songs])
@@ -162,7 +161,7 @@ def print_songs(songs: List[Song]) -> None:
 
 if __name__ == "__main__":
     album_list = [
-        AlbumDescription("A girl between two worlds", ["Fatima Yamaha"]),
+        AlbumDescription("A girl between worlds", []),
     ]
     songs, errors = get_songs(album_list)
     x = create_playlist(songs)
