@@ -12,18 +12,15 @@ function getCenter(elem) {
 /**
  *  getCoord returns the position of a touch or click event
  *
- * @param event touch/mouse event
+ * @param {MouseEvent | TouchEvent} event touch/mouse event
  * @return {{x: number, y: number}} position of touch or click with .x and .y
  */
 function getCoord(event) {
-  if (event.clientX && event.clientY) {
+  if (event instanceof MouseEvent) {
     return { x: event.clientX, y: event.clientY };
-  }
-
-  // return coordinates of first touch
-  if (event.touches && event.touches.length > 0) {
+  } else {
+    // return coordinates of first touch
     const firstTouch = event.touches[0];
-
     return { x: firstTouch.clientX, y: firstTouch.clientY };
   }
 }
@@ -45,10 +42,9 @@ function initializeDial(elem, dialName) {
   /**
    * onTwistStart is called when a user touches or clicks down on `elem`
    *
-   * @param {Event} event touch/mouse event
+   * @param {MouseEvent | TouchEvent} event touch/mouse event
    */
   function onTwistStart(event) {
-    event = event || window.event;
     event.preventDefault();
 
     const { x, y } = getCoord(event);
@@ -65,10 +61,9 @@ function initializeDial(elem, dialName) {
   /**
    * onTwist is called when a mouse moves while clicked, or dragged via touch.
    *
-   * @param {Event} event touch/mouse event
+   * @param {MouseEvent | TouchEvent} event touch/mouse event
    */
   function onTwist(event) {
-    event = event || window.event;
     event.preventDefault();
 
     const { x, y } = getCoord(event);
@@ -97,12 +92,39 @@ function initializeDial(elem, dialName) {
     const level = (1.5 + (currentAngle % (2 * Math.PI)) / (2 * Math.PI)) % 1.0;
 
     $.getJSON($SCRIPT_ROOT + '/jukebox/filter', {
-      [dialName]: level
+      name: dialName,
+      level: level
     }, function (data) {
-      console.log(data);
+      setSongs(data);
     });
   }
 }
+
+/**
+ * setSongs updates the DOM with new songs.
+ *
+ * @param {{title: string}[]} songs
+ */
+function setSongs(songs) {
+  const playlist = $('#playlist');
+
+  playlist.empty();
+  songs.forEach(song => {
+    playlist.append(songRawHTML(song));
+  });
+}
+
+/**
+ * songRawHTML returns a raw HTML string representing the song element.
+ *
+ * @param {{title: string}} song
+ * @returns {string} raw HTML string for the song
+ */
+function songRawHTML(song) {
+  return `<div class="song"><p class="title">${song.title}</p></div>`;
+}
+
+// MAIN
 
 $.each($('.dial'), function (_, elem) {
   const dial = $(elem).children('div')[0];

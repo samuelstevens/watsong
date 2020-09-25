@@ -7,8 +7,8 @@ import random
 from flask import Blueprint, render_template, request, jsonify, session
 
 from . import watson, spotify
-from .structures import Song, Feel
-from typing import Any, List
+from .structures import Song, Feel, default_feel
+from typing import Any, List, cast
 
 bp = Blueprint("jukebox", __name__, url_prefix="/jukebox")
 
@@ -38,8 +38,19 @@ def jukebox() -> Any:
 
             random.shuffle(songs)
 
+            spotify.add_audio_features(songs)
+
             session.clear()
             session["songs"] = songs
+
+            if "feel" not in session:
+                session["feel"] = default_feel()
+
+            songs = [
+                song
+                for song in cast(List[Song], session["songs"])
+                if spotify.filter_songs(session["feel"], song)
+            ]
 
     return render_template("jukebox.html", songs=songs, dials=DIALS)
 
@@ -49,15 +60,19 @@ def filter() -> Any:
     """
     Take a request and its songs and filter them according to DIALS
     """
-    print(request.args)
-    params = [request.args.get(dial.lower(), 0, type=float) for dial in DIALS]
 
-    print(params)
+    field: str = request.args["name"]
+    level = float(request.args["level"])
 
-    # TODO
-    # feel = Feel(params)
+    if "feel" not in session:
+        session["feel"] = default_feel()
 
-    # TODO: actually filter using spotify.filter_songs
-    session["songs"] = session["songs"]
+    session["feel"][field] = level
 
-    return jsonify(session["songs"])
+    songs = [
+        song
+        for song in cast(List[Song], session["songs"])
+        if spotify.filter_songs(session["feel"], song)
+    ]
+
+    return jsonify(songs)
