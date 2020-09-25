@@ -5,10 +5,10 @@ This is the main controller (called blueprints in Flask) for the application.
 import random
 from typing import Any, List, cast
 
-from flask import Blueprint, jsonify, render_template, request, session
+from flask import Blueprint, flash, jsonify, render_template, request, session
 
 from . import spotify, watson
-from .structures import Song, default_feel
+from .structures import Song, default_feel, Feel
 
 bp = Blueprint("jukebox", __name__, url_prefix="/jukebox")
 
@@ -27,20 +27,19 @@ def jukebox() -> Any:
 
         if query:
             album_descs, err = watson.get_albums(query)
-
             if err is not None:
-                # TODO
-                return jsonify({"error": str(err)})
+                flash(str(err))
+                return render_template("jukebox.html", songs=songs, dials=DIALS)
 
             songs, err = spotify.get_songs(album_descs)
-
             if err is not None:
-                return jsonify({"error": str(err)})
+                flash(str(err))
+                return render_template("jukebox.html", songs=songs, dials=DIALS)
 
             random.shuffle(songs)
 
             spotify.add_audio_features(songs)
-
+            print(songs)
             session.clear()
             session["songs"] = songs
 
@@ -52,6 +51,9 @@ def jukebox() -> Any:
                 for song in cast(List[Song], session["songs"])
                 if spotify.filter_songs(session["feel"], song)
             ]
+            print(songs)
+
+    print(songs)
 
     return render_template("jukebox.html", songs=songs, dials=DIALS)
 
@@ -62,18 +64,17 @@ def filter() -> Any:
     Take a request and its songs and filter them according to DIALS
     """
 
-    field: str = request.args["name"]
-    level = float(request.args["level"])
-
-    if "feel" not in session:
-        session["feel"] = default_feel()
-
-    session["feel"][field] = level
+    feel = Feel(
+        valence=request.args.get("valence", 1.0, type=float),
+        lyrics=request.args.get("lyrics", 1.0, type=float),
+        dance=request.args.get("dance", 1.0, type=float),
+        energy=request.args.get("energy", 1.0, type=float),
+    )
 
     songs = [
         song
         for song in cast(List[Song], session["songs"])
-        if spotify.filter_songs(session["feel"], song)
+        if spotify.filter_songs(feel, song)
     ]
 
     return jsonify(songs)

@@ -25,6 +25,7 @@ function getCoord(event) {
   }
 }
 
+
 /**
  * initializeDial makes the DOM element twistable and sends HTTP request when the twisting stops.
  *
@@ -32,12 +33,10 @@ function getCoord(event) {
  * @param {string} dialName is the dial name to be sent to the backend
  */
 function initializeDial(elem, dialName) {
-  var currentAngle = 0, prevAngle = 0, initialAngle = 0;
+  var currentAngle = 0, prevAngle = 0, initialAngle = 0, center = getCenter(elem);
 
   elem.onmousedown = onTwistStart;
   elem.ontouchstart = onTwistStart;
-
-  const center = getCenter(elem);
 
   /**
    * onTwistStart is called when a user touches or clicks down on `elem`
@@ -47,6 +46,7 @@ function initializeDial(elem, dialName) {
   function onTwistStart(event) {
     event.preventDefault();
 
+    center = getCenter(elem);
     const { x, y } = getCoord(event);
 
     initialAngle = Math.atan2(x - center.x, y - center.y);
@@ -89,14 +89,11 @@ function initializeDial(elem, dialName) {
 
     prevAngle = -currentAngle;
 
-    const level = (1.5 + (currentAngle % (2 * Math.PI)) / (2 * Math.PI)) % 1.0;
+    const level = parseFloat(((1 + INITIAL_LEVEL + (currentAngle % (2 * Math.PI)) / (2 * Math.PI)) % 1.0)
+      .toFixed(3));
 
-    $.getJSON($SCRIPT_ROOT + '/jukebox/filter', {
-      name: dialName,
-      level: level
-    }, function (data) {
-      setSongs(data);
-    });
+    GLOBAL.setFeel(dialName, level);
+
   }
 }
 
@@ -126,7 +123,46 @@ function songRawHTML(song) {
 
 // MAIN
 
+const StateModule = () => {
+  let feel = {};
+
+  /**
+   * setFeel sets a field in `feel`
+   *
+   * @param {string} field
+   * @param {number} value
+   */
+  const setFeel = (field, value) => {
+    feel[field] = value;
+
+    $.getJSON($SCRIPT_ROOT + '/jukebox/filter', feel, setSongs);
+  };
+
+  /**
+   * getFeel returns a copy of the feel object
+   *
+   * @return {*} 
+   */
+  const getFeel = () => {
+    const feelClone = {};
+    for (const field in feel) {
+      feelClone[field] = feel[field];
+    }
+    return feelClone;
+  };
+
+  return {
+    setFeel, getFeel
+  };
+};
+
+const GLOBAL = StateModule();
+const INITIAL_LEVEL = 0.1;
+
 $.each($('.dial'), function (_, elem) {
   const dial = $(elem).children('div')[0];
   initializeDial(dial, elem.id);
+  GLOBAL.setFeel(elem.id, INITIAL_LEVEL);
 });
+
+console.log(GLOBAL.getFeel());

@@ -33,4 +33,10 @@ def create_app(test_config: Optional[Any] = None) -> Flask:
         """
         return redirect(url_for("jukebox.jukebox"))
 
+    app.config.update(
+        # SESSION_COOKIE_SECURE=True,
+        # SESSION_COOKIE_HTTPONLY=True,
+        SESSION_COOKIE_SAMESITE="Lax",
+    )
+
     return app

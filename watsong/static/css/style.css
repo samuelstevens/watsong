@@ -40,17 +40,6 @@ button {
   font-size: 0.8em;
   padding: 6px;
 }
-/* 
-#prompt input[type="submit"] {
-  padding: 6px;
-  background: none;
-  border: 1px solid black;
-}
-
-#prompt input[type="submit"]:hover {
-  top: 3px;
-  left: 1px;
-} */
 
 #playlist {
   height: 40%;

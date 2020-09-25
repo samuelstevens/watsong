@@ -2,10 +2,11 @@
 This file is a starter for whatever Spotify stuff needs to happen
 """
 from typing import List, Optional
-from .structures import Album, Song, Result, AlbumDescription, Feel
 
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
+
+from .structures import Album, AlbumDescription, Feel, Result, Song
 
 # These are also stored in the environment but it's easier to leave them here
 # since it causes some problems in how I run it if I use the envionment variables
@@ -81,6 +82,9 @@ def get_songs(album_descriptions: List[AlbumDescription]) -> Result[List[Song]]:
 
 
 def add_audio_features(songs: List[Song]) -> None:
+    if not songs:
+        return
+
     song_links = []
     for song in songs:
         song_links.append(song["uri"])

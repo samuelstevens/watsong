@@ -5,15 +5,16 @@
 {% endblock %}
 
 {% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/boombox.css') }}" />
 <div id="prompt">
   <form action={{ url_for('jukebox.jukebox') }} method="post">
     <p>What are you looking for?</p>
     <input type="text" placeholder="Beach tunes for 4th of July" name="query">
-    <input type="submit" />
+    <button class="chunky-button">Go!</button>
   </form>
 </div>
 <h2>Songs</h2>
-<button onclick="showPlaylist()">Show on Spotify</button>
+<button onclick="showPlaylist()" class="chunky-button">Show on Spotify</button>
 <div id="playlist">
   {% for song in songs %}
   <div class="song">
@@ -28,7 +29,7 @@
     <p>|</p>
 
     <div>
-      <img style="transform: rotate(5.79061rad);" src="{{ url_for('static', filename='images/dial.png') }}" />
+      <img style="transform: rotate(2.801rad);" src="{{ url_for('static', filename='images/dial.png') }}" />
     </div>
 
     <span>{{ dial.lower().capitalize() }}</span>

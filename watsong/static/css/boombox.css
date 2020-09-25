@@ -1,27 +1,30 @@
 :root {
   --angle: 8px;
-  --angle-o: 4px;
-  --yellow: yellow;
-  --brown: brown;
-  --red: red;
+  --angle-hover: 7px;
+  --angle-active: 4px;
+  --face: #fffdd0;
+  --side: #b7b69a;
+  --text: black;
 }
 /* https://codepen.io/screenthink/pen/ZeOyjP?editors=1100 */
 .chunky-button {
+  margin-top: 12px;
+  margin-right: 12px;
   top: 0;
   left: 0;
-  transition: all 0.15s linear 0s;
+  transition: all 0.1s linear 0s;
   position: relative;
   display: inline-block;
   padding: 15px 25px;
   border: 0;
-  background-color: var(--yellow);
+  background-color: var(--face);
 
   text-transform: uppercase;
-  color: var(--brown);
-  font-family: arial;
+  color: var(--text);
+  font-weight: bolder;
   letter-spacing: 1px;
 
-  box-shadow: -6px 6px 0 var(--brown);
+  box-shadow: -6px 6px 0 var(--side);
   text-decoration: none;
 }
 
@@ -33,7 +36,7 @@
   left: -4px;
   width: var(--angle);
   height: var(--angle);
-  background-color: var(--brown);
+  background-color: var(--side);
   transform: rotate(45deg);
   z-index: -1;
 }
@@ -46,29 +49,49 @@
   right: 2px;
   width: var(--angle);
   height: var(--angle);
-  background-color: var(--brown);
+  background-color: var(--side);
   transform: rotate(45deg);
   z-index: -1;
 }
 
 .chunky-button:hover {
-  top: 3px;
-  left: -3px;
-  box-shadow: -3px 3px 0 var(--brown);
+  top: 1px;
+  left: -1px;
+  box-shadow: -5px 5px 0 var(--side);
 }
 
 .chunky-button:hover::after {
-  top: 1px;
-  left: -2px;
-  width: var(--angle-o);
-  height: var(--angle-o);
+  top: 1.5px;
+  left: -3.5px;
+  width: var(--angle-hover);
+  height: var(--angle-hover);
 }
 
 .chunky-button:hover::before {
+  bottom: -3.5px;
+  right: 1.5px;
+  width: var(--angle-hover);
+  height: var(--angle-hover);
+}
+
+.chunky-button:active {
+  top: 3px;
+  left: -3px;
+  box-shadow: -3px 3px 0 var(--side);
+}
+
+.chunky-button:active::after {
+  top: 1px;
+  left: -2px;
+  width: var(--angle-active);
+  height: var(--angle-active);
+}
+
+.chunky-button:active::before {
   bottom: -2px;
   right: 1px;
-  width: var(--angle-o);
-  height: var(--angle-o);
+  width: var(--angle-active);
+  height: var(--angle-active);
 }
 
 a.btn {
