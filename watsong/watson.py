@@ -12,7 +12,7 @@ from .structures import AlbumDescription, Result
 
 apikey = os.getenv("DISCOVERY_API_KEY")
 environment_id = "26e276ef-e35e-4076-a190-bab90b5a4521"
-collection_id = "3789d265-dda2-465a-98fb-e804f1435317"
+collection_id = "a1b2c559-0cbd-4f5e-ad8b-228be6678b8a"
 service_url = "https://api.us-south.discovery.watson.cloud.ibm.com/instances/230365e2-48ca-4b2f-8a9e-3dba5fbe20ed"
 version = "2019-04-30"
 
