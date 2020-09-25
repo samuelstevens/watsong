@@ -49,11 +49,11 @@ class Feel(TypedDict):
     energy: float
     lyrics: float
     dance: float
-    melody: float
+    valence: float
 
 
 def default_feel() -> Feel:
-    return Feel(energy=0.5, lyrics=0.5, dance=0.5, melody=0.5)
+    return Feel(energy=0.5, lyrics=0.5, dance=0.5, valence=0.5)
 
 
 # This is a generic type variable, like T in Java generics. Python makes us define it ourselves.

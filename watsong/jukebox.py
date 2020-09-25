@@ -29,6 +29,7 @@ def jukebox() -> Any:
             album_descs, err = watson.get_albums(query)
 
             if err is not None:
+                # TODO
                 return jsonify({"error": str(err)})
 
             songs, err = spotify.get_songs(album_descs)
