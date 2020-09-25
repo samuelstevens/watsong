@@ -6,7 +6,6 @@ It also includes some generic types that can be used for error handling, such as
 """
 
 from typing import List, NamedTuple, Optional, Tuple, TypeVar
-from dataclasses import dataclass
 
 from typing_extensions import TypedDict  # because we support 3.6.5
 

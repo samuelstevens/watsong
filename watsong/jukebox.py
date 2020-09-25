@@ -3,12 +3,12 @@ This is the main controller (called blueprints in Flask) for the application.
 """
 
 import random
-
-from flask import Blueprint, render_template, request, jsonify, session
-
-from . import watson, spotify
-from .structures import Song, Feel, default_feel
 from typing import Any, List, cast
+
+from flask import Blueprint, jsonify, render_template, request, session
+
+from . import spotify, watson
+from .structures import Song, default_feel
 
 bp = Blueprint("jukebox", __name__, url_prefix="/jukebox")
 

@@ -1,7 +1,7 @@
 """
 This file is a starter for whatever Spotify stuff needs to happen
 """
-from typing import Dict, List, Optional
+from typing import List, Optional
 
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
