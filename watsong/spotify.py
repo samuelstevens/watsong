@@ -4,10 +4,11 @@ This file is a starter for whatever Spotify stuff needs to happen
 from typing import List, Optional
 
 import spotipy
+from requests import HTTPError
 from spotipy.oauth2 import SpotifyOAuth
+
 from . import util
 from .structures import Album, AlbumDescription, Feel, Result, Song
-from requests import HTTPError
 
 # These are also stored in the environment but it's easier to leave them here
 # since it causes some problems in how I run it if I use the envionment variables

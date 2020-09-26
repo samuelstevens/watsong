@@ -2,6 +2,7 @@ import os
 from typing import Any, Optional
 
 from flask import Flask, redirect, url_for
+
 from flask_session import Session
 
 from . import jukebox

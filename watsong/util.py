@@ -1,4 +1,5 @@
 from typing import Iterator, List
+
 from .structures import T
 
 

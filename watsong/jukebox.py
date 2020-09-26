@@ -8,7 +8,7 @@ from typing import Any, List, cast
 from flask import Blueprint, flash, jsonify, render_template, request, session
 
 from . import spotify, watson
-from .structures import Song, default_feel, Feel
+from .structures import Feel, Song, default_feel
 
 bp = Blueprint("jukebox", __name__, url_prefix="/jukebox")
 
