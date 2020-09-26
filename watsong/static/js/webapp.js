@@ -100,7 +100,7 @@ function initializeDial(elem, dialName) {
 /**
  * setSongs updates the DOM with new songs.
  *
- * @param {{title: string}[]} songs
+ * @param {{title: string, artist: string}[]} songs
  */
 function setSongs(songs) {
   const playlist = $('#playlist');
@@ -114,11 +114,11 @@ function setSongs(songs) {
 /**
  * songRawHTML returns a raw HTML string representing the song element.
  *
- * @param {{title: string}} song
+ * @param {{title: string, artist: string}} song
  * @returns {string} raw HTML string for the song
  */
 function songRawHTML(song) {
-  return `<div class="song"><p class="title">${song.title}</p></div>`;
+  return `<div class="song"><p class="title">${song.title}</p><p class="artist">${song.artist}</p></div>`;
 }
 
 // MAIN
@@ -131,11 +131,15 @@ const StateModule = () => {
    *
    * @param {string} field
    * @param {number} value
+   * @param {boolean} skipRequest whether to skip the HTTP request when updating the feel
    */
-  const setFeel = (field, value) => {
+  const setFeel = (field, value, skipRequest = false) => {
     feel[field] = value;
 
-    $.getJSON($SCRIPT_ROOT + '/jukebox/filter', feel, setSongs);
+    if (!skipRequest) {
+      console.log(`Making request with ${feel}.`);
+      $.getJSON($SCRIPT_ROOT + '/jukebox/filter', feel, setSongs);
+    }
   };
 
   /**
@@ -162,7 +166,6 @@ const INITIAL_LEVEL = 0.1;
 $.each($('.dial'), function (_, elem) {
   const dial = $(elem).children('div')[0];
   initializeDial(dial, elem.id);
-  GLOBAL.setFeel(elem.id, INITIAL_LEVEL);
+  GLOBAL.setFeel(elem.id, INITIAL_LEVEL, true);
 });
 
-console.log(GLOBAL.getFeel());

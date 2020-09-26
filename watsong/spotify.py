@@ -5,8 +5,9 @@ from typing import List, Optional
 
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
-
+from . import util
 from .structures import Album, AlbumDescription, Feel, Result, Song
+from requests import HTTPError
 
 # These are also stored in the environment but it's easier to leave them here
 # since it causes some problems in how I run it if I use the envionment variables
@@ -56,7 +57,7 @@ def album_from_title_artist(title: str, artists: List[str]) -> Optional[Album]:
             # You can get more stuff like the song id if you want to...
             # https://developer.spotify.com/documentation/web-api/reference/albums/get-albums-tracks/
             [
-                Song(title=item["name"], uri=item["uri"], features={})
+                Song(title=item["name"], uri=item["uri"], features={}, artist=artist)
                 for item in tracks["items"]
             ],
         )
@@ -81,29 +82,34 @@ def get_songs(album_descriptions: List[AlbumDescription]) -> Result[List[Song]]:
     return songs, None
 
 
-def add_audio_features(songs: List[Song]) -> None:
+def add_audio_features(songs: List[Song]) -> Result[List[Song]]:
     if not songs:
-        return
+        return [], None
 
-    song_links = []
-    for song in songs:
-        song_links.append(song["uri"])
+    annotated_songs = []
 
-    feature_list = sp.audio_features(song_links)
+    for songs_chunk in util.chunks(iter(songs), 20):
+        song_links = []
+        for song in songs_chunk:
+            song_links.append(song["uri"])
 
-    for feature in feature_list:
-        song_index = feature_list.index(feature)
-        feel = {
-            "energy": feature["energy"],
-            "dance": feature["danceability"],
-            "lyrics": feature["speechiness"],
-            "valence": feature["valence"],
-        }
+        try:
+            feature_list = sp.audio_features(song_links)
+        except HTTPError as err:
+            return [], err
 
-        song = songs[song_index]
-        song["features"] = feel
+        for song, features in zip(songs_chunk, feature_list):
+            feel = {
+                "energy": features["energy"],
+                "dance": features["danceability"],
+                "lyrics": features["speechiness"],
+                "valence": features["valence"],
+            }
 
-    return
+            song["features"] = feel
+            annotated_songs.append(song)
+
+    return annotated_songs, None
 
 
 # TODO: Create a filter API based on the Feel values

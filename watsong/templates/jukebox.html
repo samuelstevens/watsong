@@ -8,20 +8,23 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/boombox.css') }}" />
 <div id="prompt">
   <form action={{ url_for('jukebox.jukebox') }} method="post">
-    <p>What are you looking for?</p>
     <input type="text" placeholder="Beach tunes for 4th of July" name="query">
-    <button class="chunky-button">Go!</button>
+    <button class="chunky-button">Get Songs</button><button onclick="showPlaylist()" class="chunky-button">Show on Spotify</button>
   </form>
 </div>
-<h2>Songs</h2>
-<button onclick="showPlaylist()" class="chunky-button">Show on Spotify</button>
+<h2>Your Mix</h2>
 <div id="playlist">
+  {% if songs|length > 0 %}
   {% for song in songs %}
   <div class="song">
     <p class="title">{{ song['title'] }}</p>
-    <!-- <p class="artist">{{ song['artist'] }}</p> -->
+    <p class="artist">{{ song['artist'] }}</p>
   </div>
   {% endfor %}
+
+  {% else %}
+  <p>No songs available...</p>
+  {% endif %}
 </div>
 <div id="dials">
   {% for dial in dials %}

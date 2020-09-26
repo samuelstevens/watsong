@@ -2,6 +2,7 @@ import os
 from typing import Any, Optional
 
 from flask import Flask, redirect, url_for
+from flask_session import Session
 
 from . import jukebox
 
@@ -37,6 +38,9 @@ def create_app(test_config: Optional[Any] = None) -> Flask:
         # SESSION_COOKIE_SECURE=True,
         # SESSION_COOKIE_HTTPONLY=True,
         SESSION_COOKIE_SAMESITE="Lax",
+        SESSION_TYPE="filesystem",
     )
+
+    Session(app)
 
     return app

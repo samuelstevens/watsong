@@ -14,6 +14,12 @@ button {
   padding: 2px;
 }
 
+h1,
+h2,
+h3 {
+  margin-top: 12px;
+}
+
 .flash {
   margin: 1em;
 }
@@ -31,18 +37,17 @@ button {
 }
 
 #prompt {
-  margin: 1em;
-  font-size: 2em;
+  margin: 4px;
 }
 
 #prompt input[type="text"] {
   width: 100%;
-  font-size: 0.8em;
+  font-size: 1em;
   padding: 6px;
 }
 
 #playlist {
-  height: 40%;
+  height: max(200px, 40vh);
   overflow: scroll;
 }
 

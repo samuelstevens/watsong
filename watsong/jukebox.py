@@ -38,8 +38,11 @@ def jukebox() -> Any:
 
             random.shuffle(songs)
 
-            spotify.add_audio_features(songs)
-            print(songs)
+            songs, err = spotify.add_audio_features(songs)
+            if err is not None:
+                flash(str(err))
+                return render_template("jukebox.html", songs=songs, dials=DIALS)
+
             session.clear()
             session["songs"] = songs
 
@@ -51,9 +54,6 @@ def jukebox() -> Any:
                 for song in cast(List[Song], session["songs"])
                 if spotify.filter_songs(session["feel"], song)
             ]
-            print(songs)
-
-    print(songs)
 
     return render_template("jukebox.html", songs=songs, dials=DIALS)
 
