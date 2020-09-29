@@ -1,5 +1,5 @@
-import unittest
 import sys
+import unittest
 
 sys.path.append("..")  # Adds higher directory to python modules path.
 

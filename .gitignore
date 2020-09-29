@@ -9,6 +9,7 @@ virtualenv/
 __pycache__/
 
 instance/
+flask_session/
 
 # test results
 .pytest_cache/

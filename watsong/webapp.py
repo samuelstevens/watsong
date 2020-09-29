@@ -1,12 +1,11 @@
 import os
+from typing import Any, Optional
 
 from flask import Flask, redirect, url_for
-from importlib import import_module
 
+from flask_session import Session
 
 from . import jukebox
-
-from typing import Optional, Any
 
 
 def create_app(test_config: Optional[Any] = None) -> Flask:
@@ -35,5 +34,14 @@ def create_app(test_config: Optional[Any] = None) -> Flask:
         Redirect index to /jukebox
         """
         return redirect(url_for("jukebox.jukebox"))
+
+    app.config.update(
+        # SESSION_COOKIE_SECURE=True,
+        # SESSION_COOKIE_HTTPONLY=True,
+        SESSION_COOKIE_SAMESITE="Lax",
+        SESSION_TYPE="filesystem",
+    )
+
+    Session(app)
 
     return app

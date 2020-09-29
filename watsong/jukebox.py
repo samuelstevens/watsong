@@ -2,15 +2,17 @@
 This is the main controller (called blueprints in Flask) for the application.
 """
 
-from flask import Blueprint, render_template, request, jsonify, session
+import random
+from typing import Any, List, cast
 
-from . import watson, spotify
-from .structures import Song
-from typing import Any, List
+from flask import Blueprint, flash, jsonify, render_template, request, session
+
+from . import spotify, watson
+from .structures import Feel, Song, default_feel
 
 bp = Blueprint("jukebox", __name__, url_prefix="/jukebox")
 
-DIALS = ["energy", "lyrics", "dance", "melody"]
+DIALS = ["dance", "lyrics", "energy", "valence"]
 
 
 @bp.route("/", methods=["GET", "POST"])
@@ -23,20 +25,56 @@ def jukebox() -> Any:
     if request.method == "POST":
         query = request.form["query"]
 
-        print(query)
-
         if query:
             album_descs, err = watson.get_albums(query)
-
             if err is not None:
-                return jsonify({"error": str(err)})
+                flash(str(err))
+                return render_template("jukebox.html", songs=songs, dials=DIALS)
 
             songs, err = spotify.get_songs(album_descs)
-
             if err is not None:
-                return jsonify({"error": str(err)})
+                flash(str(err))
+                return render_template("jukebox.html", songs=songs, dials=DIALS)
+
+            random.shuffle(songs)
+
+            songs, err = spotify.add_audio_features(songs)
+            if err is not None:
+                flash(str(err))
+                return render_template("jukebox.html", songs=songs, dials=DIALS)
 
             session.clear()
             session["songs"] = songs
 
+            if "feel" not in session:
+                session["feel"] = default_feel()
+
+            songs = [
+                song
+                for song in cast(List[Song], session["songs"])
+                if spotify.filter_songs(session["feel"], song)
+            ]
+
     return render_template("jukebox.html", songs=songs, dials=DIALS)
+
+
+@bp.route("/filter", methods=["GET"])
+def filter() -> Any:
+    """
+    Take a request and its songs and filter them according to DIALS
+    """
+
+    feel = Feel(
+        valence=request.args.get("valence", 1.0, type=float),
+        lyrics=request.args.get("lyrics", 1.0, type=float),
+        dance=request.args.get("dance", 1.0, type=float),
+        energy=request.args.get("energy", 1.0, type=float),
+    )
+
+    songs = [
+        song
+        for song in cast(List[Song], session["songs"])
+        if spotify.filter_songs(feel, song)
+    ]
+
+    return jsonify(songs)

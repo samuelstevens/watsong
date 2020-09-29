@@ -2,10 +2,13 @@
 This file is a starter for whatever Spotify stuff needs to happen
 """
 from typing import List, Optional
-from .structures import Album, Song, Result, AlbumDescription, Feel
 
 import spotipy
+from requests import HTTPError
 from spotipy.oauth2 import SpotifyOAuth
+
+from . import util
+from .structures import Album, AlbumDescription, Feel, Result, Song
 
 # These are also stored in the environment but it's easier to leave them here
 # since it causes some problems in how I run it if I use the envionment variables
@@ -23,9 +26,6 @@ sp = spotipy.Spotify(
         scope="playlist-modify-public playlist-modify-private",
     )
 )
-
-# TODO: We need to discuss how we want to get this Feel object (can't be a filter param)
-mock_feel = Feel(0.5, 0, 0.75, 0)
 
 
 def album_from_title_artist(title: str, artists: List[str]) -> Optional[Album]:
@@ -58,7 +58,7 @@ def album_from_title_artist(title: str, artists: List[str]) -> Optional[Album]:
             # You can get more stuff like the song id if you want to...
             # https://developer.spotify.com/documentation/web-api/reference/albums/get-albums-tracks/
             [
-                Song(title=item["name"], uri=item["uri"], features={})
+                Song(title=item["name"], uri=item["uri"], features={}, artist=artist)
                 for item in tracks["items"]
             ],
         )
@@ -83,48 +83,55 @@ def get_songs(album_descriptions: List[AlbumDescription]) -> Result[List[Song]]:
     return songs, None
 
 
-def add_audio_features(songs: List[Song]) -> None:
-    song_links = []
-    for song in songs:
-        song_links.append(song["uri"])
+def add_audio_features(songs: List[Song]) -> Result[List[Song]]:
+    if not songs:
+        return [], None
 
-    feature_list = sp.audio_features(song_links)
+    annotated_songs = []
 
-    for feature in feature_list:
-        song_index = feature_list.index(feature)
-        feel = {
-            "energy": feature["energy"],
-            "dance": feature["danceability"],
-            "lyrics": feature["speechiness"],
-            "valence": feature["valence"],
-        }
+    for songs_chunk in util.chunks(iter(songs), 20):
+        song_links = []
+        for song in songs_chunk:
+            song_links.append(song["uri"])
 
-        song = songs[song_index]
-        song["features"] = feel
+        try:
+            feature_list = sp.audio_features(song_links)
+        except HTTPError as err:
+            return [], err
 
-    return
+        for song, features in zip(songs_chunk, feature_list):
+            feel = {
+                "energy": features["energy"],
+                "dance": features["danceability"],
+                "lyrics": features["speechiness"],
+                "valence": features["valence"],
+            }
+
+            song["features"] = feel
+            annotated_songs.append(song)
+
+    return annotated_songs, None
 
 
 # TODO: Create a filter API based on the Feel values
-def filter_songs(song: Song) -> bool:
+def filter_songs(feel: Feel, song: Song) -> bool:
     hasEnergy = False
     hasDanceability = False
     hasLyrics = False
-    hasMelody = False
-
-    if song["features"]["energy"] >= mock_feel.energy:
+    hasValence = False
+    if song["features"]["energy"] >= feel["energy"]:
         hasEnergy = True
 
-    if song["features"]["dance"] >= mock_feel.dance:
+    if song["features"]["dance"] >= feel["dance"]:
         hasDanceability = True
 
-    if song["features"]["lyrics"] >= mock_feel.lyrics:
+    if song["features"]["lyrics"] >= feel["lyrics"]:
         hasLyrics = True
 
-    if song["features"]["valence"] >= mock_feel.valence:
-        hasMelody = True
+    if song["features"]["valence"] >= feel["valence"]:
+        hasValence = True
 
-    return hasEnergy and hasDanceability and hasLyrics and hasMelody
+    return hasEnergy and hasDanceability and hasLyrics and hasValence
 
 
 def create_playlist(songs: List[Song]) -> str:

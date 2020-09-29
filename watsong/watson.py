@@ -5,8 +5,8 @@ This file is a starter for any Watson stuff that needs to happen.
 import os
 from typing import List
 
-from ibm_cloud_sdk_core.authenticators import IAMAuthenticator  # type: ignore
-from ibm_watson import DiscoveryV1  # type: ignore
+from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
+from ibm_watson import DiscoveryV1
 
 from .structures import AlbumDescription, Result
 
