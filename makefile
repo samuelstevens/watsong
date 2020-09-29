@@ -1,3 +1,5 @@
+all: types format lint
+
 types: FORCE
 	mypy --strict -p watsong
 
