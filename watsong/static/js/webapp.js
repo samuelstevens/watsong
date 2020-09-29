@@ -88,9 +88,9 @@ function initializeDial(elem, dialName) {
     document.ontouchmove = null;
 
     prevAngle = -currentAngle;
+    // const float = currentAngle / (2 * Math.PI);
 
-    const level = parseFloat(((1 + INITIAL_LEVEL + (currentAngle % (2 * Math.PI)) / (2 * Math.PI)) % 1.0)
-      .toFixed(3));
+    const level = (currentAngle / (2 * Math.PI) + INITIAL_LEVEL + 1) % 1.0;
 
     GLOBAL.setFeel(dialName, level);
 
@@ -136,6 +136,7 @@ const StateModule = () => {
   const setFeel = (field, value, skipRequest = false) => {
     feel[field] = value;
 
+
     if (!skipRequest) {
       console.log(`Making request with ${feel}.`);
       $.getJSON($SCRIPT_ROOT + '/jukebox/filter', feel, setSongs);
@@ -161,7 +162,7 @@ const StateModule = () => {
 };
 
 const GLOBAL = StateModule();
-const INITIAL_LEVEL = 0.1;
+const INITIAL_LEVEL = 0.02;
 
 $.each($('.dial'), function (_, elem) {
   const dial = $(elem).children('div')[0];
