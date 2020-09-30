@@ -25,7 +25,7 @@ class TestSpotify(unittest.TestCase):
                 "title": "Between Worlds",
                 "uri": "spotify:track:0Vpdt3FsW8m7nC4FDk3rfw",
                 "features": {},
-                "artists": ['Fatima Yamaha']
+                "artists": ["Fatima Yamaha"],
             },
         )
         self.assertEqual(len(songs), 7)
@@ -44,8 +44,13 @@ class TestSpotify(unittest.TestCase):
             {
                 "title": "Between Worlds",
                 "uri": "spotify:track:0Vpdt3FsW8m7nC4FDk3rfw",
-                "features": {"energy": 0.611, "dance": 0.75, "valence": 0.546, "lyrics": 0.0538},
-                "artists": ['Fatima Yamaha'],
+                "features": {
+                    "energy": 0.611,
+                    "dance": 0.75,
+                    "valence": 0.546,
+                    "lyrics": 0.0538,
+                },
+                "artists": ["Fatima Yamaha"],
             },
         )
         self.assertEqual(len(songs), 7)
@@ -63,7 +68,7 @@ class TestSpotify(unittest.TestCase):
                 "title": "Harder (with Bebe Rexha)",
                 "uri": "spotify:track:5ieQrVW2U70NFMg28mzlqC",
                 "features": {},
-                "artists": ['Jax Jones', 'Bebe Rexha']
+                "artists": ["Jax Jones", "Bebe Rexha"],
             },
         )
         self.assertEqual(len(songs), 1)
