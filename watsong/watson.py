@@ -37,7 +37,7 @@ def get_albums(query: str) -> Result[List[AlbumDescription]]:
             natural_language_query=query,
             count=count,
             return_=reqd_fields,
-            deduplicate=True,
+            deduplicate_field="title",
             x_watson_logging_opt_out=True,
         )
         results = response.get_result()
