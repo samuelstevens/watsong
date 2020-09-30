@@ -1,7 +1,7 @@
 """
 This file is a starter for whatever Spotify stuff needs to happen
 """
-import pickle5 as pickle
+import pickle
 from typing import Any, Dict, List, Optional
 
 import spotipy
