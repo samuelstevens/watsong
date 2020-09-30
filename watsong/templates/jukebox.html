@@ -18,7 +18,7 @@
   {% for song in songs %}
   <div class="song">
     <p class="title">{{ song['title'] }}</p>
-    <p class="artist">{{ song['artist'] }}</p>
+    <p class="artist">{{ ", ".join(song['artists']) }}</p>
   </div>
   {% endfor %}
 

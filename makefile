@@ -1,4 +1,4 @@
-all: types format lint
+all: types format lint test
 
 types: FORCE
 	mypy --strict -p watsong
@@ -9,5 +9,8 @@ format: FORCE
 
 lint: FORCE
 	flake8 watsong
+
+test:
+    python -m unittest
 
 FORCE:

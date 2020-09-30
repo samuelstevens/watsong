@@ -1,11 +1,11 @@
 """
 This file is a starter for whatever Spotify stuff needs to happen
 """
-from typing import List, Optional
+import pickle
+from typing import Any, Dict, List, Optional
 
 import spotipy
-from requests import HTTPError
-from spotipy.oauth2 import SpotifyOAuth
+from spotipy.oauth2 import SpotifyClientCredentials, SpotifyOAuth
 
 from . import util
 from .structures import Album, AlbumDescription, Feel, Result, Song
@@ -27,19 +27,87 @@ sp = spotipy.Spotify(
     )
 )
 
+# Client credentials for spotify. May be a bit faster to run.
+spcc = spotipy.Spotify(
+    auth_manager=SpotifyClientCredentials(
+        client_id=CLIENT_ID,
+        client_secret=CLIENT_SECRET,
+    )
+)
 
-def album_from_title_artist(title: str, artists: List[str]) -> Optional[Album]:
-    """
-    Return an album
-    :return:
-    """
-    # Set max limit for now...
-    search_result = sp.search(f"{title}", type="album", limit=50)
-    results = search_result["albums"]["items"]
 
+def query(title: str, artists: List[str]) -> str:
+    return f"{title}"
+
+
+def get_memo(name: str) -> Any:
+    try:
+        with open(f"{name}.pickle", "rb") as file:
+            return pickle.load(file)
+    except IOError:
+        return {}
+
+
+def set_memo(structure: Any, name: str) -> None:
+    try:
+        with open(f"{name}.pickle", "wb") as file:
+            pickle.dump(structure, file, protocol=pickle.HIGHEST_PROTOCOL)
+    except IOError:
+        print(f"Error with saving {name}.pickle when trying to save {structure}")
+
+
+search_memo = get_memo("search")
+album_tracks_memo = get_memo("tracks")
+feature_memo = get_memo("features")
+
+
+def cache(album_descriptions: List[AlbumDescription]) -> None:
+    """
+    Cache the results for the given album descriptions for fast lookup later.
+    Calling this before using the spotify methods on a list of albums will improve
+    performance.
+    """
+    global search_memo
+    global album_tracks_memo
+    global feature_memo
+    for title, artists in album_descriptions:
+        q = query(title, artists)
+        try:
+            search_result = search_memo[q]
+        except KeyError:
+            search_result = spcc.search(query(title, artists), type="album", limit=50)
+            search_memo[q] = search_result
+        album_id = find_album_id_from_search(search_result, artists)
+        if album_id:
+            try:
+                album_tracks_memo[album_id] = album_tracks_memo[album_id]
+            except KeyError:
+                album_tracks_memo[album_id] = spcc.album_tracks(album_id)
+    set_memo(search_memo, "search")
+    set_memo(album_tracks_memo, "tracks")
+
+    songs, err = get_songs(album_descriptions)
+    for songs_chunk in util.chunks(iter(songs), 100):
+        seenAllSongs = True
+        song_links = [song["uri"] for song in songs_chunk]
+        for link in song_links:
+            if link not in feature_memo:
+                seenAllSongs = False
+        if not seenAllSongs:
+            feature_list = spcc.audio_features(song_links)
+            for uri, features in zip(song_links, feature_list):
+                feature_memo[uri] = features
+
+    set_memo(feature_memo, "features")
+
+
+def find_album_id_from_search(
+    search: Dict[str, Any], artists: List[str]
+) -> Optional[str]:
+    results = search["albums"]["items"]
+
+    album_id = None
     if len(results) > 0:
-        album_id = None
-
         # Go through results and find the album with the desired artist
         for result in results:
             artist = result["artists"][0]["name"]
@@ -49,16 +117,38 @@ def album_from_title_artist(title: str, artists: List[str]) -> Optional[Album]:
 
         if album_id is None:
             album_id = results[0]["id"]
+    return album_id
 
-        tracks = sp.album_tracks(album_id)
+
+def album_from_title_artist(title: str, artists: List[str]) -> Optional[Album]:
+    """
+    Return an album
+    :return:
+    """
+    q = query(title, artists)
+    try:
+        search_result = search_memo[q]
+    except KeyError:
+        search_result = spcc.search(q, type="album", limit=50)
+        print(f"Key error looking up the query {q}")
+    album_id = find_album_id_from_search(search_result, artists)
+    if album_id:
+        try:
+            tracks = album_tracks_memo[album_id]
+        except KeyError:
+            tracks = spcc.album_tracks(album_id)
+            print(f"Key error looking up the track with id {album_id}")
         return Album(
             title,
             album_id,
             artists,
-            # You can get more stuff like the song id if you want to...
-            # https://developer.spotify.com/documentation/web-api/reference/albums/get-albums-tracks/
             [
-                Song(title=item["name"], uri=item["uri"], features={}, artist=artist)
+                Song(
+                    title=item["name"],
+                    uri=item["uri"],
+                    features={},
+                    artists=[artist["name"] for artist in item["artists"]],
+                )
                 for item in tracks["items"]
             ],
         )
@@ -71,8 +161,8 @@ def get_songs(album_descriptions: List[AlbumDescription]) -> Result[List[Song]]:
     Given a list of albums, find all the songs in those albums according to Spotify.
     """
     songs = []
-    for title, artist in album_descriptions:
-        result = album_from_title_artist(title, artist)
+    for title, artistList in album_descriptions:
+        result = album_from_title_artist(title, artistList)
 
         if not result:
             continue
@@ -88,27 +178,24 @@ def add_audio_features(songs: List[Song]) -> Result[List[Song]]:
         return [], None
 
     annotated_songs = []
-
-    for songs_chunk in util.chunks(iter(songs), 20):
-        song_links = []
-        for song in songs_chunk:
-            song_links.append(song["uri"])
-
+    feature_list = []
+    for song in songs:
         try:
-            feature_list = sp.audio_features(song_links)
-        except HTTPError as err:
-            return [], err
+            features = feature_memo[song["uri"]]
+        except KeyError:
+            features = spcc.audio_features(song["uri"])[0]
+        feature_list.append(features)
 
-        for song, features in zip(songs_chunk, feature_list):
-            feel = {
-                "energy": features["energy"],
-                "dance": features["danceability"],
-                "lyrics": features["speechiness"],
-                "valence": features["valence"],
-            }
+    for song, features in zip(songs, feature_list):
+        feel = {
+            "energy": features["energy"],
+            "dance": features["danceability"],
+            "lyrics": features["speechiness"],
+            "valence": features["valence"],
+        }
 
-            song["features"] = feel
-            annotated_songs.append(song)
+        song["features"] = feel
+        annotated_songs.append(song)
 
     return annotated_songs, None
 
@@ -157,13 +244,6 @@ def create_playlist(songs: List[Song]) -> str:
         )
     sp.playlist_replace_items(playlist["id"], [song["uri"] for song in songs])
     return f'https://open.spotify.com/embed/playlist/{playlist["id"]}'
-
-
-def print_songs(songs: List[Song]) -> None:
-    for song in songs:
-        print(song)
-        print()
-    return
 
 
 if __name__ == "__main__":
