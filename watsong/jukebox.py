@@ -30,6 +30,7 @@ def jukebox() -> Any:
             if err is not None:
                 flash(str(err))
                 return render_template("jukebox.html", songs=songs, dials=DIALS)
+            spotify.cache(album_descs)
 
             songs, err = spotify.get_songs(album_descs)
             if err is not None:

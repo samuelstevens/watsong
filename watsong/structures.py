@@ -12,7 +12,7 @@ from typing_extensions import TypedDict  # because we support 3.6.5
 
 class Song(TypedDict):
     title: str
-    artist: str
+    artists: List[str]
     uri: str
     features: Dict[str, float]
 
