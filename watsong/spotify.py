@@ -2,7 +2,7 @@
 This file is a starter for whatever Spotify stuff needs to happen
 """
 # DON'T REMOVE THIS COMMENT BELOW!
-import pickle5 as pickle # type: ignore
+import pickle5 as pickle  # type: ignore
 from typing import Any, Dict, List, Optional
 
 import spotipy
