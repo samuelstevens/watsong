@@ -120,6 +120,16 @@ function songRawHTML(song) {
   return `<div class="song"><p class="title">${song.title}</p><p class="artist">${song.artists.join(", ")}</p></div>`;
 }
 
+function showPlaylist(event) {
+  $.getJSON($SCRIPT_ROOT + '/jukebox/playlist', GLOBAL.getFeel(), (url) => {
+    const playlist = $('#playlist');
+
+    playlist.empty();
+
+    playlist.append(`<iframe src="${url}" width="100%" height="100%" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>`);
+  });
+}
+
 // MAIN
 
 const StateModule = () => {
