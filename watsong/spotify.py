@@ -1,10 +1,9 @@
 """
 This file is a starter for whatever Spotify stuff needs to happen
 """
-# DON'T REMOVE THIS COMMENT BELOW!
-import pickle5 as pickle  # type: ignore
 from typing import Any, Dict, List, Optional
 
+import pickle5 as pickle
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials, SpotifyOAuth
 

@@ -8,7 +8,7 @@ from typing import Any, List, cast
 from flask import Blueprint, flash, jsonify, render_template, request, session
 
 from . import spotify, watson
-from .structures import Feel, Song, default_feel
+from .structures import Feel, Song, default_feel, assert_feel
 
 bp = Blueprint("jukebox", __name__, url_prefix="/jukebox")
 
@@ -44,7 +44,6 @@ def jukebox() -> Any:
                 flash(str(err))
                 return render_template("jukebox.html", songs=songs, dials=DIALS)
 
-            session.clear()
             session["songs"] = songs
 
             if "feel" not in session:
@@ -71,6 +70,8 @@ def filter() -> Any:
         dance=request.args.get("dance", 1.0, type=float),
         energy=request.args.get("energy", 1.0, type=float),
     )
+
+    assert_feel(feel)
 
     songs = [
         song

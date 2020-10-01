@@ -11,6 +11,6 @@ lint: FORCE
 	flake8 watsong
 
 test:
-    python -m unittest
+	python -m unittest
 
 FORCE:
