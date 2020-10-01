@@ -75,7 +75,6 @@ def cache(album_descriptions: List[AlbumDescription]) -> None:
         try:
             search_result = search_memo[q]
         except KeyError:
-            print("fail")
             search_result = spcc.search(query(title, artists), type="album", limit=50)
             search_memo[q] = search_result
         album_id = find_album_id_from_search(search_result, artists)
@@ -83,7 +82,6 @@ def cache(album_descriptions: List[AlbumDescription]) -> None:
             try:
                 album_tracks_memo[album_id] = album_tracks_memo[album_id]
             except KeyError:
-                print("fail2")
                 album_tracks_memo[album_id] = spcc.album_tracks(album_id)
     set_memo(search_memo, "search")
     set_memo(album_tracks_memo, "tracks")
@@ -96,7 +94,6 @@ def cache(album_descriptions: List[AlbumDescription]) -> None:
             if link not in feature_memo:
                 seenAllSongs = False
         if not seenAllSongs:
-            print("fail3")
             feature_list = spcc.audio_features(song_links)
             for uri, features in zip(song_links, feature_list):
                 feature_memo[uri] = features

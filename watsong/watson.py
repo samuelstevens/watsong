@@ -26,7 +26,7 @@ def get_albums(query: str) -> Result[List[AlbumDescription]]:
     Given a natural language query, use watson to return the best albums for that query.
     """
     reqd_fields = "title, author"
-    count = 1000
+    count = 50
     albums = []
     error = None
 
@@ -46,5 +46,4 @@ def get_albums(query: str) -> Result[List[AlbumDescription]]:
             albums.append(album_desc)
     except Exception as e:
         error = e
-    print(len(albums))
     return albums, error
