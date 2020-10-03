@@ -33,3 +33,7 @@ jobs:
       - name: Test python unit tests
         run: |
           python -m unittest
+      - name: Run integration tests
+        run: |
+          source envs/dev-unix.sh
+          pytest

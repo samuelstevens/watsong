@@ -71,6 +71,8 @@ def filter() -> Any:
         energy=request.args.get("energy", 1.0, type=float),
     )
 
+    session["feel"] = feel
+
     assert_feel(feel)
 
     songs = [

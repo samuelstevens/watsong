@@ -12,5 +12,6 @@ lint: FORCE
 
 test:
 	python -m unittest
+	pytest
 
 FORCE:
