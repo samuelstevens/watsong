@@ -1,8 +1,8 @@
 # type: ignore
 
 import flask
-import pytest
-from .. import structures, spotify
+
+from .. import spotify, structures
 
 
 def test_index(client):
@@ -57,9 +57,6 @@ def test_query_session_songs(app):
             follow_redirects=True,
         )
         assert "songs" in flask.session
-
-        with open("page.html", "wb") as file:
-            file.write(response.data)
 
         for song in flask.session["songs"]:
             if spotify.filter_songs(flask.session["feel"], song):

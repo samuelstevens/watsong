@@ -1,9 +1,11 @@
 # type: ignore
 
-import pytest
 from typing import Any
-from .. import webapp
+
 import flask
+import pytest
+
+from .. import webapp
 
 
 @pytest.fixture()
