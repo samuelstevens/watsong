@@ -54,7 +54,18 @@ class Feel(TypedDict):
 
 
 def default_feel() -> Feel:
-    return Feel(energy=0.5, lyrics=0.5, dance=0.5, valence=0.5)
+    # 0.02 because the frontend starts at 0.02
+    return Feel(energy=0.02, lyrics=0.02, dance=0.02, valence=0.02)
+
+
+def assert_feel(feel: Feel) -> None:
+    """
+    Checks that a feel doesn't have any negative values. This indicates a bug in the code somewhere.
+    """
+    assert feel["energy"] >= 0, f"{feel}['energy'] is less than 0."
+    assert feel["lyrics"] >= 0, f"{feel}['lyrics'] is less than 0."
+    assert feel["dance"] >= 0, f"{feel}['dance'] is less than 0."
+    assert feel["valence"] >= 0, f"{feel}['valence'] is less than 0."
 
 
 # This is a generic type variable, like T in Java generics. Python makes us define it ourselves.

@@ -88,9 +88,8 @@ function initializeDial(elem, dialName) {
     document.ontouchmove = null;
 
     prevAngle = -currentAngle;
-    // const float = currentAngle / (2 * Math.PI);
 
-    const level = (currentAngle / (2 * Math.PI) + INITIAL_LEVEL + 1) % 1.0;
+    const level = (currentAngle / (2 * Math.PI) + INITIAL_LEVEL + 5) % 1.0;
 
     GLOBAL.setFeel(dialName, level);
 
@@ -100,7 +99,7 @@ function initializeDial(elem, dialName) {
 /**
  * setSongs updates the DOM with new songs.
  *
- * @param {{title: string, artist: string}[]} songs
+ * @param {{title: string, artists: string[]}[]} songs
  */
 function setSongs(songs) {
   const playlist = $('#playlist');
@@ -114,11 +113,21 @@ function setSongs(songs) {
 /**
  * songRawHTML returns a raw HTML string representing the song element.
  *
- * @param {{title: string, artist: string}} song
+ * @param {{title: string, artists: string[]}} song
  * @returns {string} raw HTML string for the song
  */
 function songRawHTML(song) {
-  return `<div class="song"><p class="title">${song.title}</p><p class="artist">${song.artist}</p></div>`;
+  return `<div class="song"><p class="title">${song.title}</p><p class="artist">${song.artists.join(", ")}</p></div>`;
+}
+
+function showPlaylist(event) {
+  $.getJSON($SCRIPT_ROOT + '/jukebox/playlist', GLOBAL.getFeel(), (url) => {
+    const playlist = $('#playlist');
+
+    playlist.empty();
+
+    playlist.append(`<iframe src="${url}" width="100%" height="100%" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>`);
+  });
 }
 
 // MAIN

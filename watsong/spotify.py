@@ -87,7 +87,7 @@ def cache(album_descriptions: List[AlbumDescription]) -> None:
     set_memo(album_tracks_memo, "tracks")
 
     songs, err = get_songs(album_descriptions)
-    for songs_chunk in util.chunks(iter(songs), 5):
+    for songs_chunk in util.chunks(iter(songs), 100):
         seenAllSongs = True
         song_links = [song["uri"] for song in songs_chunk]
         for link in song_links:

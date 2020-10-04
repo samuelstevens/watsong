@@ -32,4 +32,9 @@ jobs:
           mypy --strict -p watsong
       - name: Test python unit tests
         run: |
+          source envs/dev-unix.sh
           python -m unittest
+      - name: Run integration tests
+        run: |
+          source envs/dev-unix.sh
+          pytest

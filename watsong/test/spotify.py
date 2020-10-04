@@ -6,8 +6,8 @@ import unittest
 
 sys.path.append("..")  # Adds higher directory to python modules path.
 
-from watsong.spotify import add_audio_features, create_playlist, get_songs
-from watsong.structures import AlbumDescription
+from ..spotify import add_audio_features, create_playlist, get_songs
+from ..structures import AlbumDescription
 
 # TODO: Once Sam finalizes the filter songs API, unit tests need to be made for it
 
