@@ -38,7 +38,6 @@ def jukebox() -> Any:
                 return render_template("jukebox.html", songs=songs, dials=DIALS)
 
             random.shuffle(songs)
-
             songs, err = spotify.add_audio_features(songs)
             if err is not None:
                 flash(str(err))

@@ -70,11 +70,13 @@ def cache(album_descriptions: List[AlbumDescription]) -> None:
     global search_memo
     global album_tracks_memo
     global feature_memo
+    missed = [False, False, False]
     for title, artists in album_descriptions:
         q = query(title, artists)
         try:
             search_result = search_memo[q]
         except KeyError:
+            missed[0] = True
             search_result = spcc.search(query(title, artists), type="album", limit=50)
             search_memo[q] = search_result
         album_id = find_album_id_from_search(search_result, artists)
@@ -82,9 +84,12 @@ def cache(album_descriptions: List[AlbumDescription]) -> None:
             try:
                 album_tracks_memo[album_id] = album_tracks_memo[album_id]
             except KeyError:
+                missed[1] = True
                 album_tracks_memo[album_id] = spcc.album_tracks(album_id)
-    set_memo(search_memo, "search")
-    set_memo(album_tracks_memo, "tracks")
+    if missed[0]:
+        set_memo(search_memo, "search")
+    if missed[1]:
+        set_memo(album_tracks_memo, "tracks")
 
     songs, err = get_songs(album_descriptions)
     for songs_chunk in util.chunks(iter(songs), 100):
@@ -94,11 +99,13 @@ def cache(album_descriptions: List[AlbumDescription]) -> None:
             if link not in feature_memo:
                 seenAllSongs = False
         if not seenAllSongs:
+            missed[2] = True
             feature_list = spcc.audio_features(song_links)
             for uri, features in zip(song_links, feature_list):
                 feature_memo[uri] = features
 
-    set_memo(feature_memo, "features")
+    if missed[2]:
+        set_memo(feature_memo, "features")
 
 
 def find_album_id_from_search(
@@ -242,7 +249,7 @@ def create_playlist(songs: List[Song]) -> str:
             collaborative=True,
             description="A playlist created by watsong just for you",
         )
-    sp.playlist_replace_items(playlist["id"], [song["uri"] for song in songs][:100])
+    sp.playlist_replace_items(playlist["id"], [song["uri"] for song in songs[:100]])
     return f'https://open.spotify.com/embed/playlist/{playlist["id"]}'
 
 
