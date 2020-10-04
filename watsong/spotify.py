@@ -87,7 +87,7 @@ def cache(album_descriptions: List[AlbumDescription]) -> None:
     set_memo(album_tracks_memo, "tracks")
 
     songs, err = get_songs(album_descriptions)
-    for songs_chunk in util.chunks(iter(songs), 5):
+    for songs_chunk in util.chunks(iter(songs), 100):
         seenAllSongs = True
         song_links = [song["uri"] for song in songs_chunk]
         for link in song_links:
@@ -200,7 +200,6 @@ def add_audio_features(songs: List[Song]) -> Result[List[Song]]:
     return annotated_songs, None
 
 
-# TODO: Create a filter API based on the Feel values
 def filter_songs(feel: Feel, song: Song) -> bool:
     hasEnergy = False
     hasDanceability = False
