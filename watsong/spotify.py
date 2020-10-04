@@ -207,7 +207,6 @@ def add_audio_features(songs: List[Song]) -> Result[List[Song]]:
     return annotated_songs, None
 
 
-# TODO: Create a filter API based on the Feel values
 def filter_songs(feel: Feel, song: Song) -> bool:
     hasEnergy = False
     hasDanceability = False
