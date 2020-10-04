@@ -7,16 +7,15 @@ from flask_session import Session
 
 from . import jukebox
 
+SESSION = Session()
+
 
 def create_app(test_config: Optional[Any] = None) -> Flask:
     """
     Creates and configures the app. Flask uses this as the entry point.
     """
     app = Flask(__name__, instance_relative_config=True)
-    app.config.from_mapping(
-        SECRET_KEY=os.environ["SECRET_KEY"],
-        DATABASE=os.path.join(app.instance_path, "flaskr.sqlite"),
-    )
+    app.config.from_mapping(SECRET_KEY=os.environ["SECRET_KEY"])
 
     if test_config is None:
         app.config.from_pyfile("config.py", silent=True)
@@ -42,6 +41,6 @@ def create_app(test_config: Optional[Any] = None) -> Flask:
         SESSION_TYPE="filesystem",
     )
 
-    Session(app)
+    SESSION.init_app(app)
 
     return app

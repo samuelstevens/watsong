@@ -10,7 +10,12 @@ format: FORCE
 lint: FORCE
 	flake8 watsong
 
-test:
-    python -m unittest
+test: FORCE
+	pytest
+
+coverage: FORCE
+	coverage run --include "watsong/*" -m pytest
+	coverage html
+	open htmlcov/index.html
 
 FORCE:
