@@ -1,5 +1,6 @@
 import re
-from ..spotify import add_audio_features, create_playlist, get_songs, filter_songs
+
+from ..spotify import add_audio_features, create_playlist, filter_songs, get_songs
 from ..structures import AlbumDescription, Feel, Song
 
 

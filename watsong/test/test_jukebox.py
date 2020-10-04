@@ -1,5 +1,6 @@
 import flask
-from flask import testing, Flask
+from flask import Flask, testing
+
 from .. import spotify, structures
 
 
