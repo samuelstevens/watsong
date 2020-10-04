@@ -1,23 +1,21 @@
-# type: ignore
-
 import flask
-
+from flask import testing, Flask
 from .. import spotify, structures
 
 
-def test_index(client):
+def test_index(client: "testing.FlaskClient[flask.Response]") -> None:
     response = client.get("/")
     assert b"redirect" in response.data
     assert b"jukebox" in response.data
 
 
-def test_jukebox(client):
+def test_jukebox(client: "testing.FlaskClient[flask.Response]") -> None:
     response = client.get("/jukebox/")
     assert b"redirect" not in response.data
     assert b"Watsong" in response.data
 
 
-def test_query_frontend(client):
+def test_query_frontend(client: "testing.FlaskClient[flask.Response]") -> None:
     response = client.post(
         "/jukebox/",
         data=dict(query="Beach songs"),
@@ -28,7 +26,7 @@ def test_query_frontend(client):
     assert b"Watsong" in response.data
 
 
-def test_query_form(app):
+def test_query_form(app: Flask) -> None:
     with app.test_request_context(
         "/jukebox/", method="POST", data=dict(query="Beach songs")
     ):
@@ -38,7 +36,7 @@ def test_query_form(app):
         assert flask.request.form["query"] == "Beach songs"
 
 
-def test_query_session_feel(app):
+def test_query_session_feel(app: Flask) -> None:
     with app.test_client() as c:
         c.post(
             "/jukebox/",
@@ -49,7 +47,7 @@ def test_query_session_feel(app):
         assert flask.session["feel"] == structures.default_feel()
 
 
-def test_query_session_songs(app):
+def test_query_session_songs(app: Flask) -> None:
     with app.test_client() as c:
         response = c.post(
             "/jukebox/",
@@ -65,7 +63,7 @@ def test_query_session_songs(app):
                 )
 
 
-def test_query_filter(app):
+def test_query_filter(app: Flask) -> None:
     dance_value = 0.1
     valence_value = 0.2
     energy_value = 0.3
