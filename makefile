@@ -11,7 +11,6 @@ lint: FORCE
 	flake8 watsong
 
 test: FORCE
-	python -m unittest
 	pytest
 
 coverage: FORCE
