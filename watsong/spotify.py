@@ -250,6 +250,19 @@ def create_playlist(songs: List[Song]) -> str:
         )
     sp.playlist_replace_items(playlist["id"], [song["uri"] for song in songs[:100]])
     return f'https://open.spotify.com/embed/playlist/{playlist["id"]}'
+    
+
+"""Given a list of playlist/album ids find the net average 
+feature data (acousticness, danceability, energy, instrumentalness, liveness, loudness, speechiness, valence, tempo)
+for the entire collection of songs in the playlists/albums"""
+def get_features(List[str]: ids) -> Dict[str, float]:
+    return
+
+"""Return count playlist ids which are the most popular and relevant to the input query"""
+def get_playlist_ids(str:query, int:count) -> List[str]:
+    return
+
+
 
 
 if __name__ == "__main__":
