@@ -104,7 +104,8 @@ def get_albums(query: str) -> Result[List[AlbumDescription]]:
     #                 enriched_text.emotion.document.emotion.joy>?? , 
     #                 enriched_text.emotion.document.emotion.anger>?? , 
     
-    real_query = ""
+    # to-do: add real query here 
+    real_query = "" 
 
     try:
         response = discovery.query(
