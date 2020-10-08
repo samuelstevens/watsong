@@ -83,6 +83,16 @@ def filter() -> Any:
     return jsonify(songs)
 
 
+@bp.route("/showPlaylist",methods=["GET"])
+def showPlaylist() -> Any:
+    """
+    Show embedded spotify playlist
+    """
+    url = spotify.create_playlist(session["songs"])
+    print(url)
+    return jsonify(url)
+
+
 @bp.route("/playlist", methods=["GET"])
 def playlist() -> Any:
     """

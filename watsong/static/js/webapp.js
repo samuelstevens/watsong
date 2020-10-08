@@ -110,6 +110,14 @@ function setSongs(songs) {
   });
 }
 
+function showPlaylist() {
+    $.getJSON($SCRIPT_ROOT + '/jukebox/showPlaylist',{},function(data) {
+        $("#playlist").empty();
+        $("#playlist").append('<iframe src="'+data+'" width="100%" height="380" frameborder="0" allowtransparency="true" allow="encrypted-media" id="spotify"></iframe>'
+        );
+    });
+}
+
 /**
  * songRawHTML returns a raw HTML string representing the song element.
  *
@@ -119,17 +127,16 @@ function setSongs(songs) {
 function songRawHTML(song) {
   return `<div class="song"><p class="title">${song.title}</p><p class="artist">${song.artists.join(", ")}</p></div>`;
 }
-
+/*
 function showPlaylist(event) {
   $.getJSON($SCRIPT_ROOT + '/jukebox/playlist', GLOBAL.getFeel(), (url) => {
     const playlist = $('#playlist');
-
     playlist.empty();
 
     playlist.append(`<iframe src="${url}" width="100%" height="100%" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>`);
   });
 }
-
+*/
 // MAIN
 
 const StateModule = () => {
