@@ -5,6 +5,7 @@ import pickle
 from typing import Any, Dict, List, Optional
 
 import spotipy
+import heapq
 from spotipy.oauth2 import SpotifyClientCredentials, SpotifyOAuth
 
 from . import util
@@ -207,24 +208,19 @@ def add_audio_features(songs: List[Song]) -> Result[List[Song]]:
     return annotated_songs, None
 
 
-def filter_songs(feel: Feel, song: Song) -> bool:
-    hasEnergy = False
-    hasDanceability = False
-    hasLyrics = False
-    hasValence = False
-    if song["features"]["energy"] >= feel["energy"]:
-        hasEnergy = True
+def filter_songs(feel: Feel, songs: List[Song], n: int = 25) -> List[Song]:
+    # Find the N songs closest to the given feel, measured by the L2 distance.
+    def dist(x: Song) -> float:
+        song_feel = x["features"]
+        diff = [
+            feel["energy"] - song_feel["energy"],
+            feel["dance"] - song_feel["dance"],
+            feel["lyrics"] - song_feel["lyrics"],
+            feel["valence"] - song_feel["valence"],
+        ]
+        return sum([d * d for d in diff])
 
-    if song["features"]["dance"] >= feel["dance"]:
-        hasDanceability = True
-
-    if song["features"]["lyrics"] >= feel["lyrics"]:
-        hasLyrics = True
-
-    if song["features"]["valence"] >= feel["valence"]:
-        hasValence = True
-
-    return hasEnergy and hasDanceability and hasLyrics and hasValence
+    return heapq.nsmallest(n, songs, key=dist)
 
 
 def create_playlist(songs: List[Song]) -> str:
@@ -236,19 +232,18 @@ def create_playlist(songs: List[Song]) -> str:
         if playlist["name"] == "Watsong Playlist"
     ]
     if len(watsong_list):
-        # Get the first playlist named 'Watsong Playlist'
-        playlist = watsong_list[0]
+        # Clear playlists named 'Watsong Playlist'
         # Clear it
-    else:
-        # If we can't find it, create a new one.
-        playlist = sp.user_playlist_create(
-            USERNAME,
-            "Watsong Playlist",
-            public=True,
-            collaborative=True,
-            description="A playlist created by watsong just for you",
-        )
-    sp.playlist_replace_items(playlist["id"], [song["uri"] for song in songs[:100]])
+        for playlist in watsong_list:
+            sp.current_user_unfollow_playlist(playlist["id"])
+    playlist = sp.user_playlist_create(
+        sp.current_user()["id"],
+        "Watsong Playlist",
+        public=True,
+        collaborative=False,
+        description="A playlist created by watsong just for you",
+    )
+    sp.playlist_add_items(playlist["id"], [song["uri"] for song in songs[:100]])
     return f'https://open.spotify.com/embed/playlist/{playlist["id"]}'
 
 

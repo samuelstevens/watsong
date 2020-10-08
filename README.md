@@ -63,11 +63,6 @@ python -m watsong.spotify # or whatever
 ```
 
 ## Running the unit tests
-To run unit tests for the python code 
-(runs all tests in the test/ subdirectory with name test_*.py)
-```bash
-python -m unittest
-```
 
 ## Contributing
 Make sure your commits are linted with black by running
@@ -81,3 +76,8 @@ Also run
 mypy --strict -p watsong
 ```
 to detect any issues thrown by numpy.
+
+Finally, make sure the unit tests pass.
+```bash
+pytest
+```
