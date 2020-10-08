@@ -133,9 +133,13 @@ def test_filter_songs_choose_closer() -> None:
         for i in range(2)
     ]
 
-    filtered = filter_songs(Feel(dance=0.1, energy=1, valence=0.3, lyrics=0.1), songs_list, 1)
+    filtered = filter_songs(
+        Feel(dance=0.1, energy=1, valence=0.3, lyrics=0.1), songs_list, 1
+    )
     assert len(filtered) == 1
     assert filtered[0]["title"] == "0"
-    filtered = filter_songs(Feel(dance=0.8, energy=1, valence=0.8, lyrics=0.1), songs_list, 1)
+    filtered = filter_songs(
+        Feel(dance=0.8, energy=1, valence=0.8, lyrics=0.1), songs_list, 1
+    )
     assert len(filtered) == 1
     assert filtered[0]["title"] == "1"
