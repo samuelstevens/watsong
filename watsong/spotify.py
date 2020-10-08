@@ -219,7 +219,8 @@ def filter_songs(feel: Feel, songs: List[Song], n: int = 25) -> List[Song]:
             feel["valence"] - song_feel["valence"],
         ]
         return sum([d * d for d in diff])
-    print("First song in filter_songs: ",heapq.nsmallest(n, songs, key=dist)[0])
+
+    print("First song in filter_songs: ", heapq.nsmallest(n, songs, key=dist)[0])
     return heapq.nsmallest(n, songs, key=dist)
 
 

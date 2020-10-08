@@ -74,7 +74,7 @@ def filter() -> Any:
     return jsonify(songs)
 
 
-@bp.route("/showPlaylist",methods=["GET"])
+@bp.route("/showPlaylist", methods=["GET"])
 def showPlaylist() -> Any:
     """
     Show embedded spotify playlist
