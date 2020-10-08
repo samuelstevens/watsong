@@ -255,20 +255,141 @@ def create_playlist(songs: List[Song]) -> str:
 """Given a list of playlist/album ids find the net average 
 feature data (acousticness, danceability, energy, instrumentalness, liveness, loudness, speechiness, valence, tempo)
 for the entire collection of songs in the playlists/albums"""
-def get_features(List[str]: ids) -> Dict[str, float]:
-    return
+
+def get_album_features(ids: List[str]) -> Dict[str, float]:
+    all_features = {
+        "danceability": [],
+        "energy": [],
+        "key": [],
+        "loudness": [],
+        "mode": [],
+        "speechiness": [],
+        "acousticness": [],
+        "instrumentalness": [],
+        "liveness": [],
+        "valence": [],
+        "tempo": []
+    }
+
+    for id in ids:
+        songsPerTrack = sp.album_tracks(id)['items']
+
+        for song in songsPerTrack:
+            featuresForSong = sp.audio_features(song['uri'])
+
+            for feature_type in featuresForSong[0].keys():
+                if feature_type in all_features.keys():
+                    value_of_feature = featuresForSong[0][feature_type]
+                    all_features[feature_type].append(value_of_feature)
+
+    for (feature_name, values) in all_features.items():
+        all_features[feature_name] = sum(values) / len(values)
+
+    return all_features
+
+def get_playlist_features(ids: List[str]) -> Dict[str, float]:
+    all_features = {
+        "danceability": [],
+        "energy": [],
+        "key": [],
+        "loudness": [],
+        "mode": [],
+        "speechiness": [],
+        "acousticness": [],
+        "instrumentalness": [],
+        "liveness": [],
+        "valence": [],
+        "tempo": []
+    }
+
+    for id in ids:
+        songsPerTrack = sp.playlist_tracks(id)['items']
+
+        for song in songsPerTrack:
+            featuresForSong = sp.audio_features(song['track']['uri'])
+
+            for feature_type in featuresForSong[0].keys():
+                if feature_type in all_features.keys():
+                    value_of_feature = featuresForSong[0][feature_type]
+                    all_features[feature_type].append(value_of_feature)
+
+    for (feature_name, values) in all_features.items():
+        all_features[feature_name] = sum(values) / len(values)
+
+    return all_features
+
+"""Return count album ids which are the most popular and relevant to the input query"""
+def get_album_ids(query: str, count: int) -> List[str]:
+    result = sp.search(query, count, type="album")
+
+    ids = []
+    for playlist in result['albums']['items']:
+        ids.append(playlist['id'])
+
+    return ids
 
 """Return count playlist ids which are the most popular and relevant to the input query"""
-def get_playlist_ids(str:query, int:count) -> List[str]:
-    return
+# Note @param count can be max 50
+def get_playlist_ids(query: str, count: int) -> List[str]:
+    result = sp.search(query, count, type="playlist")
 
+    ids = []
+    for playlist in result['playlists']['items']:
+        ids.append(playlist['id'])
 
+    return ids
 
+def average_of_album_playlist_features(album_features: dict, playlist_features: dict):
+    average_features = {
+        "danceability": None,
+        "energy": None,
+        "key": None,
+        "loudness": None,
+        "mode": None,
+        "speechiness": None,
+        "acousticness": None,
+        "instrumentalness": None,
+        "liveness": None,
+        "valence": None,
+        "tempo": None
+    }
+
+    if len(set(album_features.keys()).difference(set(playlist_features.keys()))) == 0:
+        feature_types = album_features.keys()
+
+        for feature_name in feature_types:
+            average_features[feature_name] = (album_features[feature_name] + playlist_features[feature_name]) / 2
+
+    return average_features
 
 if __name__ == "__main__":
-    album_list = [
-        AlbumDescription("A girl between worlds", []),
-    ]
-    songs, errors = get_songs(album_list)
-    x = create_playlist(songs)
-    print(x)
+    query = input("Input query: ")
+    count = input("Enter count of ids: ")
+
+    is_album_or_feature_input = input("Do you want features for albums or playlists?\n\t(0 = album, 1 = playlist, 2 = average of both, but takes a while): ")
+    is_album_or_feature = int(is_album_or_feature_input)
+
+    final_features = None
+    if (is_album_or_feature is 0):
+        album_ids = get_album_ids(query, count)
+        album_features = get_album_features(album_ids)
+        final_features = album_features
+
+    elif (is_album_or_feature == 1):
+        playlist_ids = get_playlist_ids(query, count)
+        playlist_features = get_playlist_features(playlist_ids)
+
+        final_features = playlist_features
+
+    elif (is_album_or_feature == 2):
+        album_ids = get_album_ids(query, count)
+        album_features = get_album_features(album_ids)
+
+        playlist_ids = get_playlist_ids(query, count)
+        playlist_features = get_playlist_features(playlist_ids)
+
+        final_features = average_of_album_playlist_features(album_features, playlist_features)
+
+    print("Features of songs: ")
+    print()
+    print(final_features)
