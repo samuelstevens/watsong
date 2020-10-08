@@ -115,6 +115,7 @@ function showPlaylist() {
         $("#playlist").empty();
         $("#playlist").append('<iframe src="'+data+'" width="100%" height="380" frameborder="0" allowtransparency="true" allow="encrypted-media" id="spotify"></iframe>'
         );
+        session.clear()
     });
 }
 

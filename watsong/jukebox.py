@@ -79,16 +79,21 @@ def showPlaylist() -> Any:
     """
     Show embedded spotify playlist
     """
-    url = spotify.create_playlist(session["songs"])
+    """url = spotify.create_playlist(session["songs"])"""
+
+    songs = spotify.filter_songs(session["feel"], session["songs"])
+
+    url = spotify.create_playlist(songs)
     print(url)
     return jsonify(url)
 
 
+"""
 @bp.route("/playlist", methods=["GET"])
 def playlist() -> Any:
-    """
+    
     Take a request and its songs and filter them according to DIALS
-    """
+    
 
     feel = Feel(
         valence=request.args.get("valence", 1.0, type=float),
@@ -104,3 +109,4 @@ def playlist() -> Any:
     url = spotify.create_playlist(songs)
 
     return jsonify(url)
+"""
