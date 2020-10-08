@@ -23,6 +23,7 @@ build/
 
 # other caches
 .mypy_cache/
+.cache
 
 # IDE-related, add as necessary
 .vscode/
