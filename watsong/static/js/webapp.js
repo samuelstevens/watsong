@@ -120,7 +120,7 @@ function songRawHTML(song) {
   return `<div class="song"><p class="title">${song.title}</p><p class="artist">${song.artists.join(", ")}</p></div>`;
 }
 
-function showPlaylist(event) {
+function showPlaylist() {
   $.getJSON($SCRIPT_ROOT + '/jukebox/playlist', GLOBAL.getFeel(), (url) => {
     const playlist = $('#playlist');
 

@@ -36,6 +36,10 @@ h3 {
   transition: all 1s ease;
 }
 
+img {
+  width: 100%;
+}
+
 #prompt {
   margin: 4px;
 }
