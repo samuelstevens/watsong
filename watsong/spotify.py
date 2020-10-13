@@ -28,14 +28,6 @@ sp = spotipy.Spotify(
     )
 )
 
-# Client credentials for spotify. May be a bit faster to run.
-spcc = spotipy.Spotify(
-    auth_manager=SpotifyClientCredentials(
-        client_id=CLIENT_ID,
-        client_secret=CLIENT_SECRET,
-    )
-)
-
 
 def query(title: str, artists: List[str]) -> str:
     return f"{title}"
@@ -78,7 +70,7 @@ def cache(album_descriptions: List[AlbumDescription]) -> None:
             search_result = search_memo[q]
         except KeyError:
             missed[0] = True
-            search_result = spcc.search(query(title, artists), type="album", limit=50)
+            search_result = sp.search(query(title, artists), type="album", limit=50)
             search_memo[q] = search_result
         album_id = find_album_id_from_search(search_result, artists)
         if album_id:
@@ -86,7 +78,7 @@ def cache(album_descriptions: List[AlbumDescription]) -> None:
                 album_tracks_memo[album_id] = album_tracks_memo[album_id]
             except KeyError:
                 missed[1] = True
-                album_tracks_memo[album_id] = spcc.album_tracks(album_id)
+                album_tracks_memo[album_id] = sp.album_tracks(album_id)
     if missed[0]:
         set_memo(search_memo, "search")
     if missed[1]:
@@ -101,7 +93,7 @@ def cache(album_descriptions: List[AlbumDescription]) -> None:
                 seenAllSongs = False
         if not seenAllSongs:
             missed[2] = True
-            feature_list = spcc.audio_features(song_links)
+            feature_list = sp.audio_features(song_links)
             for uri, features in zip(song_links, feature_list):
                 feature_memo[uri] = features
 
@@ -137,14 +129,14 @@ def album_from_title_artist(title: str, artists: List[str]) -> Optional[Album]:
     try:
         search_result = search_memo[q]
     except KeyError:
-        search_result = spcc.search(q, type="album", limit=50)
+        search_result = sp.search(q, type="album", limit=50)
         print(f"Key error looking up the query {q}")
     album_id = find_album_id_from_search(search_result, artists)
     if album_id:
         try:
             tracks = album_tracks_memo[album_id]
         except KeyError:
-            tracks = spcc.album_tracks(album_id)
+            tracks = sp.album_tracks(album_id)
             print(f"Key error looking up the track with id {album_id}")
         return Album(
             title,
@@ -191,7 +183,7 @@ def add_audio_features(songs: List[Song]) -> Result[List[Song]]:
         try:
             features = feature_memo[song["uri"]]
         except KeyError:
-            features = spcc.audio_features(song["uri"])[0]
+            features = sp.audio_features(song["uri"])[0]
         feature_list.append(features)
 
     for song, features in zip(songs, feature_list):
