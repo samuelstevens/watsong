@@ -13,9 +13,9 @@ from .structures import Album, AlbumDescription, Feel, Result, Song
 
 # These are also stored in the environment but it's easier to leave them here
 # since it causes some problems in how I run it if I use the envionment variables
-CLIENT_ID = "5d141ce6f09c4fbfa12d16ce9e5d40c1"
-CLIENT_SECRET = "52fed0d6564a4e6f8e596b78bd1abf62"
-USERNAME = "mo8wax9tenoczvhquxllzca37"
+CLIENT_ID = "8170c7110cfb4503af349a6a8ea22fd3"
+CLIENT_SECRET = "0be6c71210bd495ab3f75e9b7f8a8935"
+USERNAME = "rp5ukikcsq2vjzakx29pxazlq"
 
 # If it doesn't work, try deleting the .cache file... will look for a more consistent solution
 # later. Actually it tends to work and just give an error message so it's not that bad.
@@ -23,7 +23,7 @@ sp = spotipy.Spotify(
     auth_manager=SpotifyOAuth(
         client_id=CLIENT_ID,
         client_secret=CLIENT_SECRET,
-        redirect_uri="http://localhost:8888/callback",
+        redirect_uri="http://localhost:7233/callback",
         scope="playlist-modify-public playlist-modify-private",
     )
 )
