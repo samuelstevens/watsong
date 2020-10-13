@@ -220,6 +220,7 @@ def filter_songs(feel: Feel, songs: List[Song], n: int = 25) -> List[Song]:
         ]
         return sum([d * d for d in diff])
 
+    print("First song in filter_songs: ", heapq.nsmallest(n, songs, key=dist)[0])
     return heapq.nsmallest(n, songs, key=dist)
 
 
@@ -244,6 +245,7 @@ def create_playlist(songs: List[Song]) -> str:
         description="A playlist created by watsong just for you",
     )
     sp.playlist_add_items(playlist["id"], [song["uri"] for song in songs[:100]])
+    print(songs[0])
     return f'https://open.spotify.com/embed/playlist/{playlist["id"]}'
 
 
