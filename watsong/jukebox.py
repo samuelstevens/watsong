@@ -48,11 +48,7 @@ def jukebox() -> Any:
             if "feel" not in session:
                 session["feel"] = default_feel()
 
-            songs = [
-                song
-                for song in cast(List[Song], session["songs"])
-                if spotify.filter_songs(session["feel"], song)
-            ]
+            songs = spotify.filter_songs(session["feel"], session["songs"])
 
     return render_template("jukebox.html", songs=songs, dials=DIALS)
 
@@ -62,7 +58,6 @@ def filter() -> Any:
     """
     Take a request and its songs and filter them according to DIALS
     """
-
     feel = Feel(
         valence=request.args.get("valence", 1.0, type=float),
         lyrics=request.args.get("lyrics", 1.0, type=float),
@@ -74,20 +69,31 @@ def filter() -> Any:
 
     assert_feel(feel)
 
-    songs = [
-        song
-        for song in cast(List[Song], session["songs"])
-        if spotify.filter_songs(feel, song)
-    ]
+    songs = spotify.filter_songs(session["feel"], session["songs"])
 
     return jsonify(songs)
 
 
+@bp.route("/showPlaylist", methods=["GET"])
+def showPlaylist() -> Any:
+    """
+    Show embedded spotify playlist
+    """
+    """url = spotify.create_playlist(session["songs"])"""
+
+    songs = spotify.filter_songs(session["feel"], session["songs"])
+
+    url = spotify.create_playlist(songs)
+    print(url)
+    return jsonify(url)
+
+
+"""
 @bp.route("/playlist", methods=["GET"])
 def playlist() -> Any:
-    """
+    
     Take a request and its songs and filter them according to DIALS
-    """
+    
 
     feel = Feel(
         valence=request.args.get("valence", 1.0, type=float),
@@ -98,12 +104,9 @@ def playlist() -> Any:
 
     assert_feel(feel)
 
-    songs = [
-        song
-        for song in cast(List[Song], session["songs"])
-        if spotify.filter_songs(feel, song)
-    ][:100]
+    songs = spotify.filter_songs(session["feel"], session["songs"])
 
     url = spotify.create_playlist(songs)
 
     return jsonify(url)
+"""
