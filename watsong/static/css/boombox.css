@@ -10,6 +10,7 @@
 .chunky-button {
   margin-top: 12px;
   margin-right: 12px;
+  margin-left: 6px;
   top: 0;
   left: 0;
   transition: all 0.1s linear 0s;
@@ -26,6 +27,7 @@
 
   box-shadow: -6px 6px 0 var(--side);
   text-decoration: none;
+  z-index: auto;
 }
 
 .chunky-button::after {
@@ -51,7 +53,7 @@
   height: var(--angle);
   background-color: var(--side);
   transform: rotate(45deg);
-  z-index: -1;
+  z-index: 1;
 }
 
 .chunky-button:hover {
@@ -127,8 +129,34 @@ a:active::after {
 
 .speaker {
   position: absolute;
-  bottom: 10px;
+  top: 25%;
+  width: min(20%, (100vw - 800px)/2);
+}
+
+@media screen and (max-width: 1024px) {
+  .speaker {
+    display: none;
+  }
+}
+
+.dial {
   width: 20%;
+  margin: 2%;
+  display: inline-block;
+  text-align: center;
+}
+
+.dial img {
+  width: 100%;
+  transition: all 1s ease;
+  display: block;
+}
+
+@media screen and (max-width: 512px) {
+  .dial {
+    width: 45%;
+    margin: 2%;
+  }
 }
 
 #left {

@@ -9,9 +9,9 @@
 <div class="speaker" id="right">
   <img src="{{ url_for('static', filename='images/right.svg') }}" />
 </div>
-<div id="jukebox">
+<div id="jukebox" style="padding: 2px; background-color: gray; z-index: 2;">
   <header>
-    <h1>Watsong</h1>
+    <h1 style="font-family: Sharpie;">Watsong</h1>
   </header>
   <div id="prompt">
     <form action={{ url_for('jukebox.jukebox') }} method="post">
@@ -19,8 +19,9 @@
       <button class="chunky-button">Get Songs</button><button type="button" onclick="showPlaylist()" class="chunky-button">Show on Spotify</button>
     </form>
   </div>
+  <div style="height: 12px"></div>
   <h2>Your Mix</h2>
-  <div id="playlist">
+  <div id="playlist" style="box-shadow: inset 0 -12px 30px rgba(0, 0, 0, 0.5); border-radius: 12px;">
     {% if songs|length > 0 %}
     {% for song in songs %}
     <div class="song">
@@ -30,7 +31,7 @@
     {% endfor %}
 
     {% else %}
-    <p>No songs available...</p>
+    <p style="text-align: center; margin-top: 12px;">No songs available...</p>
     {% endif %}
   </div>
   <div id="dials">
