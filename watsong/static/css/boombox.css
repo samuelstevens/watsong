@@ -113,3 +113,43 @@ a:active::after {
   top: 1px;
   left: 1px;
 }
+
+.dial-shadow {
+  position: absolute;
+  top: 8px;
+  z-index: -1;
+}
+
+#jukebox {
+  max-width: min(800px, 98%);
+  margin: auto;
+}
+
+.speaker {
+  position: absolute;
+  bottom: 10px;
+  width: 20%;
+}
+
+#left {
+  left: 10px;
+}
+
+#right {
+  right: 10px;
+}
+
+#playlist {
+  height: max(200px, 40vh);
+  overflow: scroll;
+}
+
+.song {
+  border: 1px solid gray;
+  margin: 15px;
+  padding: 6px;
+}
+
+.song > .title {
+  font-weight: bold;
+}

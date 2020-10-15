@@ -1,48 +1,51 @@
 {% extends 'base.html' %}
 
-{% block header %}
-<h1>{% block title %}Watsong{% endblock %}</h1>
-{% endblock %}
 
 {% block content %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/boombox.css') }}" />
-<div style="position: absolute; left: 0; top: 0; width: 20%;">
-  <img src="{{ url_for('static', filename='images/woofer.png') }}" />
+<div class="speaker" id="left">
+  <img src="{{ url_for('static', filename='images/left.svg') }}" />
 </div>
-<div id="prompt">
-  <form action={{ url_for('jukebox.jukebox') }} method="post">
-    <input type="text" placeholder="Beach tunes for 4th of July" name="query">
-    <button class="chunky-button">Get Songs</button><button type="button" onclick="showPlaylist()" class="chunky-button">Show on Spotify</button>
-  </form>
+<div class="speaker" id="right">
+  <img src="{{ url_for('static', filename='images/right.svg') }}" />
 </div>
-<h2>Your Mix</h2>
-<div id="playlist">
-  {% if songs|length > 0 %}
-  {% for song in songs %}
-  <div class="song">
-    <p class="title">{{ song['title'] }}</p>
-    <p class="artist">{{ ", ".join(song['artists']) }}</p>
+<div id="jukebox">
+  <header>
+    <h1>Watsong</h1>
+  </header>
+  <div id="prompt">
+    <form action={{ url_for('jukebox.jukebox') }} method="post">
+      <input type="text" placeholder="Beach tunes for 4th of July" name="query">
+      <button class="chunky-button">Get Songs</button><button type="button" onclick="showPlaylist()" class="chunky-button">Show on Spotify</button>
+    </form>
   </div>
-  {% endfor %}
-
-  {% else %}
-  <p>No songs available...</p>
-  {% endif %}
-</div>
-<div id="dials">
-  {% for dial in dials %}
-  <div class="dial" id="{{ dial.lower() }}">
-    <p>|</p>
-
-    <div>
-      <img style="transform: rotate(2.805rad);" src="{{ url_for('static', filename='images/dial.png') }}" />
+  <h2>Your Mix</h2>
+  <div id="playlist">
+    {% if songs|length > 0 %}
+    {% for song in songs %}
+    <div class="song">
+      <p class="title">{{ song['title'] }}</p>
+      <p class="artist">{{ ", ".join(song['artists']) }}</p>
     </div>
+    {% endfor %}
 
-    <span>{{ dial.lower().capitalize() }}</span>
+    {% else %}
+    <p>No songs available...</p>
+    {% endif %}
   </div>
-  {% endfor %}
+  <div id="dials">
+    {% for dial in dials %}
+    <div class="dial" id="{{ dial.lower() }}" style="position: relative;">
+      <div>
+        <img src="{{ url_for('static', filename='images/dial-face.svg') }}" />
+      </div>
+      <img class="dial-shadow" src="{{ url_for('static', filename='images/dial-shadow.svg') }}" />
+      <div style="height: 12px"></div>
+      <span>{{ dial.lower().capitalize() }}</span>
+    </div>
+    {% endfor %}
+  </div>
 </div>
-
 <script src="{{ url_for('static', filename = 'js/webapp.js') }}"></script>
 
 {% endblock %}

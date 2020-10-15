@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0" y="0" width="760" height="1182" viewBox="0, 0, 380, 591">
+  <defs>
+    <radialGradient id="Gradient_1" gradientUnits="userSpaceOnUse" cx="483" cy="245" r="190">
+      <stop offset="0.81" stop-color="#FFE967"/>
+      <stop offset="0.918" stop-color="#D11D00"/>
+      <stop offset="1" stop-color="#FFAE67"/>
+    </radialGradient>
+    <linearGradient id="Gradient_2" gradientUnits="userSpaceOnUse" x1="327" y1="445.5" x2="293" y2="445.5">
+      <stop offset="0" stop-color="#FFE967"/>
+      <stop offset="0.531" stop-color="#D11D00"/>
+      <stop offset="1" stop-color="#FFAE67"/>
+    </linearGradient>
+    <linearGradient id="Gradient_3" gradientUnits="userSpaceOnUse" x1="-639" y1="-445.5" x2="-673" y2="-445.5" gradientTransform="matrix(-1, -0, 0, -1, 0, 0)">
+      <stop offset="0" stop-color="#FFE967"/>
+      <stop offset="0.531" stop-color="#D11D00"/>
+      <stop offset="1" stop-color="#FFAE67"/>
+    </linearGradient>
+  </defs>
+  <g id="Jukebox" transform="translate(-293, -55)">
+    <path d="M483,418.5 C387.179,418.5 309.5,340.821 309.5,245 C309.5,149.179 387.179,71.5 483,71.5 C578.821,71.5 656.5,149.179 656.5,245 C656.5,340.821 578.821,418.5 483,418.5 z" fill="#9D6434"/>
+    <path d="M483,55 C587.934,55 673,140.066 673,245 C673,349.934 587.934,435 483,435 C378.066,435 293,349.934 293,245 C293,140.066 378.066,55 483,55 z M483,88.5 C396.567,88.5 326.5,158.567 326.5,245 C326.5,331.433 396.567,401.5 483,401.5 C569.433,401.5 639.5,331.433 639.5,245 C639.5,158.567 569.433,88.5 483,88.5 z" fill="url(#Gradient_1)"/>
+    <path d="M293,245 L327,245 L327,646 L293,646 L293,245 z" fill="url(#Gradient_2)"/>
+    <path d="M673,646 L639,646 L639,245 L673,245 L673,646 z" fill="url(#Gradient_3)"/>
+    <path d="M309,245 L657,245 L657,646 L309,646 L309,245 z" fill="#9C6434"/>
+    <path d="M309,239 L327,239 L327,302 L309,302 L309,239 z" fill="#20FBB3"/>
+    <path d="M309,328 L327,328 L327,391 L309,391 L309,328 z" fill="#F42A79"/>
+    <path d="M309,416 L327,416 L327,479 L309,479 L309,416 z" fill="#20FBB3"/>
+    <path d="M309,500 L327,500 L327,563 L309,563 L309,500 z" fill="#F42A79"/>
+    <path d="M309,583 L327,583 L327,646 L309,646 L309,583 z" fill="#20FBB3"/>
+    <path d="M639,328 L657,328 L657,391 L639,391 L639,328 z" fill="#F42A79"/>
+    <path d="M639,416 L657,416 L657,479 L639,479 L639,416 z" fill="#20FBB3"/>
+    <path d="M639,500 L657,500 L657,563 L639,563 L639,500 z" fill="#F42A79"/>
+    <path d="M639,583 L657,583 L657,646 L639,646 L639,583 z" fill="#20FBB3"/>
+    <path d="M639,239 L657,239 L657,302 L639,302 L639,239 z" fill="#20FBB3"/>
+  </g>
+</svg>

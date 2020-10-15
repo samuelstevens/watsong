@@ -5,7 +5,7 @@
     Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
 }
 
-main {
+header {
   max-width: min(800px, 98%);
   margin: auto;
 }
@@ -34,6 +34,7 @@ h3 {
 .dial img {
   width: 100%;
   transition: all 1s ease;
+  display: block;
 }
 
 img {
@@ -41,26 +42,11 @@ img {
 }
 
 #prompt {
-  margin: 4px;
+  margin: 4px 0px;
 }
 
 #prompt input[type="text"] {
   width: 100%;
   font-size: 1em;
   padding: 6px;
-}
-
-#playlist {
-  height: max(200px, 40vh);
-  overflow: scroll;
-}
-
-.song {
-  border: 1px solid gray;
-  margin: 15px;
-  padding: 6px;
-}
-
-.song > .title {
-  font-weight: bold;
 }
