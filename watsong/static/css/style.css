@@ -10,6 +10,10 @@
     Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
 }
 
+body {
+  background-color: #ffecb3;
+}
+
 header {
   max-width: min(800px, 98%);
   margin: auto;
@@ -22,8 +26,10 @@ button {
 h1 {
   margin-top: 12px;
   font-family: Sharpie;
-  font-size: 5em;
-  color: darkblue;
+  font-size: 6em;
+  font-weight: bold;
+  color: #102027;
+  text-align: center;
 }
 
 .flash {
@@ -41,5 +47,13 @@ img {
 #prompt input[type="text"] {
   width: calc(100% - 18px);
   font-size: 1em;
-  padding: 6px;
+  padding: 8px;
+  border: 0;
+  background-color: black;
+  font-family: "Courier New", Courier, monospace;
+  color: greenyellow;
+}
+
+#prompt input[type="text"]:focus {
+  outline: none;
 }
