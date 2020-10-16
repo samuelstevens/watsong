@@ -6,7 +6,7 @@ from typing import Any, Dict, List, Optional
 
 import spotipy
 import heapq
-from spotipy.oauth2 import SpotifyClientCredentials, SpotifyOAuth
+from spotipy.oauth2 import SpotifyOAuth
 
 from . import util
 from .structures import Album, AlbumDescription, Feel, Result, Song
@@ -216,7 +216,7 @@ def filter_songs(feel: Feel, songs: List[Song], n: int = 25) -> List[Song]:
     return heapq.nsmallest(n, songs, key=dist)
 
 
-def create_playlist(songs: List[Song]) -> str:
+def create_playlist(songs: List[Song], full_url: bool = True) -> str:
     # Find the watsong playlist and use it if possible
     playlists = sp.current_user_playlists()
     watsong_list = [
@@ -224,21 +224,39 @@ def create_playlist(songs: List[Song]) -> str:
         for playlist in playlists["items"]
         if playlist["name"] == "Watsong Playlist"
     ]
-    if len(watsong_list):
-        # Clear playlists named 'Watsong Playlist'
-        # Clear it
-        for playlist in watsong_list:
-            sp.current_user_unfollow_playlist(playlist["id"])
+    for playlist in watsong_list:
+        sp.current_user_unfollow_playlist(playlist["id"])
     playlist = sp.user_playlist_create(
         sp.current_user()["id"],
         "Watsong Playlist",
-        public=True,
-        collaborative=False,
+        public=False,
+        collaborative=True,
         description="A playlist created by watsong just for you",
     )
     sp.playlist_add_items(playlist["id"], [song["uri"] for song in songs[:100]])
-    print(songs[0])
-    return f'https://open.spotify.com/embed/playlist/{playlist["id"]}'
+    return (
+        f'https://open.spotify.com/embed/playlist/{playlist["id"]}'
+        if full_url
+        else str(playlist["id"])
+    )
+
+
+def subscribe_to_playlist(id: str) -> Optional[Exception]:
+    user_login = spotipy.Spotify(
+        auth_manager=SpotifyOAuth(
+            client_id=CLIENT_ID,
+            client_secret=CLIENT_SECRET,
+            redirect_uri="http://localhost:7233/callback",
+            scope="playlist-modify-private",
+            cache_path=".cache-user-login",
+            show_dialog=True,
+        )
+    )
+    try:
+        user_login.current_user_follow_playlist(id)
+    except Exception as e:
+        return e
+    return None
 
 
 if __name__ == "__main__":
@@ -246,5 +264,6 @@ if __name__ == "__main__":
         AlbumDescription("A girl between worlds", []),
     ]
     songs, errors = get_songs(album_list)
-    x = create_playlist(songs)
+    x = create_playlist(songs, full_url=False)
+    subscribe_to_playlist(x)
     print(x)
