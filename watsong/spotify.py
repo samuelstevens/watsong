@@ -17,22 +17,17 @@ CLIENT_ID = "8170c7110cfb4503af349a6a8ea22fd3"
 CLIENT_SECRET = "0be6c71210bd495ab3f75e9b7f8a8935"
 USERNAME = "rp5ukikcsq2vjzakx29pxazlq"
 
-cached_sp = None
-
 
 def get_spotify() -> spotipy.Spotify:
-    global cached_sp
-    if cached_sp is None:
-        cached_sp = spotipy.Spotify(
-            oauth_manager=SpotifyOAuth(
-                client_id=CLIENT_ID,
-                client_secret=CLIENT_SECRET,
-                redirect_uri="http://localhost:7233/callback",
-                scope="playlist-modify-public playlist-modify-private",
-                show_dialog=True,
-            )
+    return spotipy.Spotify(
+        oauth_manager=SpotifyOAuth(
+            client_id=CLIENT_ID,
+            client_secret=CLIENT_SECRET,
+            redirect_uri="http://localhost:7233/callback",
+            scope="playlist-modify-public playlist-modify-private",
+            show_dialog=True,
         )
-    return cached_sp
+    )
 
 
 def query(title: str, artists: List[str]) -> str:
