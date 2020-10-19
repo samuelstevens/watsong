@@ -1,5 +1,5 @@
 """
-This file is a starter for whatever Spotify stuff needs to happen
+A file to communicate with the spotify API
 """
 import pickle
 from typing import Any, Dict, List, Optional
@@ -9,24 +9,30 @@ import heapq
 from spotipy.oauth2 import SpotifyOAuth
 
 from . import util
-from .structures import Album, AlbumDescription, Feel, Result, Song
+from .structures import Album, AlbumDescription, Feel, Song
 
 # These are also stored in the environment but it's easier to leave them here
-# since it causes some problems in how I run it if I use the envionment variables
+# since it causes some problems in how I run it if I use the environment variables
 CLIENT_ID = "8170c7110cfb4503af349a6a8ea22fd3"
 CLIENT_SECRET = "0be6c71210bd495ab3f75e9b7f8a8935"
 USERNAME = "rp5ukikcsq2vjzakx29pxazlq"
 
-# If it doesn't work, try deleting the .cache file... will look for a more consistent solution
-# later. Actually it tends to work and just give an error message so it's not that bad.
-sp = spotipy.Spotify(
-    auth_manager=SpotifyOAuth(
-        client_id=CLIENT_ID,
-        client_secret=CLIENT_SECRET,
-        redirect_uri="http://localhost:7233/callback",
-        scope="playlist-modify-public playlist-modify-private",
-    )
-)
+cached_sp = None
+
+
+def get_spotify() -> spotipy.Spotify:
+    global cached_sp
+    if cached_sp is None:
+        cached_sp = spotipy.Spotify(
+            oauth_manager=SpotifyOAuth(
+                client_id=CLIENT_ID,
+                client_secret=CLIENT_SECRET,
+                redirect_uri="http://localhost:7233/callback",
+                scope="playlist-modify-public playlist-modify-private",
+                show_dialog=True,
+            )
+        )
+    return cached_sp
 
 
 def query(title: str, artists: List[str]) -> str:
@@ -54,7 +60,9 @@ album_tracks_memo = get_memo("tracks")
 feature_memo = get_memo("features")
 
 
-def cache(album_descriptions: List[AlbumDescription]) -> None:
+def cache(
+        album_descriptions: List[AlbumDescription], sp: spotipy.Spotify = get_spotify()
+) -> None:
     """
     Cache the results for the given album descriptions for fast lookup later.
     Calling this before using the spotify methods on a list of albums will improve
@@ -84,7 +92,7 @@ def cache(album_descriptions: List[AlbumDescription]) -> None:
     if missed[1]:
         set_memo(album_tracks_memo, "tracks")
 
-    songs, err = get_songs(album_descriptions)
+    songs = get_songs(album_descriptions)
     for songs_chunk in util.chunks(iter(songs), 100):
         seenAllSongs = True
         song_links = [song["uri"] for song in songs_chunk]
@@ -102,7 +110,7 @@ def cache(album_descriptions: List[AlbumDescription]) -> None:
 
 
 def find_album_id_from_search(
-    search: Dict[str, Any], artists: List[str]
+        search: Dict[str, Any], artists: List[str]
 ) -> Optional[str]:
     results = search["albums"]["items"]
 
@@ -120,7 +128,9 @@ def find_album_id_from_search(
     return album_id
 
 
-def album_from_title_artist(title: str, artists: List[str]) -> Optional[Album]:
+def album_from_title_artist(
+        title: str, artists: List[str], sp: spotipy.Spotify = get_spotify()
+) -> Optional[Album]:
     """
     Return an album
     :return:
@@ -156,13 +166,15 @@ def album_from_title_artist(title: str, artists: List[str]) -> Optional[Album]:
     return None
 
 
-def get_songs(album_descriptions: List[AlbumDescription]) -> Result[List[Song]]:
+def get_songs(
+        album_descriptions: List[AlbumDescription], sp: spotipy.Spotify = get_spotify()
+) -> List[Song]:
     """
     Given a list of albums, find all the songs in those albums according to Spotify.
     """
     songs = []
     for title, artistList in album_descriptions:
-        result = album_from_title_artist(title, artistList)
+        result = album_from_title_artist(title, artistList, sp)
 
         if not result:
             continue
@@ -170,12 +182,14 @@ def get_songs(album_descriptions: List[AlbumDescription]) -> Result[List[Song]]:
         title, id, artists, tracks = result
         songs.extend(tracks)
 
-    return songs, None
+    return songs
 
 
-def add_audio_features(songs: List[Song]) -> Result[List[Song]]:
+def add_audio_features(
+        songs: List[Song], sp: spotipy.Spotify = get_spotify()
+) -> List[Song]:
     if not songs:
-        return [], None
+        return []
 
     annotated_songs = []
     feature_list = []
@@ -197,7 +211,7 @@ def add_audio_features(songs: List[Song]) -> Result[List[Song]]:
         song["features"] = feel
         annotated_songs.append(song)
 
-    return annotated_songs, None
+    return annotated_songs
 
 
 def filter_songs(feel: Feel, songs: List[Song], n: int = 25) -> List[Song]:
@@ -216,16 +230,10 @@ def filter_songs(feel: Feel, songs: List[Song], n: int = 25) -> List[Song]:
     return heapq.nsmallest(n, songs, key=dist)
 
 
-def create_playlist(songs: List[Song], full_url: bool = True) -> str:
+def create_playlist(
+        songs: List[Song], full_url: bool = True, sp: spotipy.Spotify = get_spotify()
+) -> str:
     # Find the watsong playlist and use it if possible
-    playlists = sp.current_user_playlists()
-    watsong_list = [
-        playlist
-        for playlist in playlists["items"]
-        if playlist["name"] == "Watsong Playlist"
-    ]
-    for playlist in watsong_list:
-        sp.current_user_unfollow_playlist(playlist["id"])
     playlist = sp.user_playlist_create(
         sp.current_user()["id"],
         "Watsong Playlist",
@@ -234,6 +242,9 @@ def create_playlist(songs: List[Song], full_url: bool = True) -> str:
         description="A playlist created by watsong just for you",
     )
     sp.playlist_add_items(playlist["id"], [song["uri"] for song in songs[:100]])
+    # Unsubscribe from the playlist immediately. The user can subscribe later by hitting the
+    # Subscribe button.
+    sp.current_user_unfollow_playlist(playlist["id"])
     return (
         f'https://open.spotify.com/embed/playlist/{playlist["id"]}'
         if full_url
@@ -241,29 +252,19 @@ def create_playlist(songs: List[Song], full_url: bool = True) -> str:
     )
 
 
-def subscribe_to_playlist(id: str) -> Optional[Exception]:
-    user_login = spotipy.Spotify(
-        auth_manager=SpotifyOAuth(
-            client_id=CLIENT_ID,
-            client_secret=CLIENT_SECRET,
-            redirect_uri="http://localhost:7233/callback",
-            scope="playlist-modify-private",
-            cache_path=".cache-user-login",
-            show_dialog=True,
-        )
-    )
-    try:
-        user_login.current_user_follow_playlist(id)
-    except Exception as e:
-        return e
-    return None
+def subscribe_to_playlist(id: str, sp: spotipy.Spotify = get_spotify()) -> None:
+    """
+    Take the current playlist and save it so that it isn't overwritten later.
+    """
+    sp.current_user_follow_playlist(id)
 
 
 if __name__ == "__main__":
     album_list = [
         AlbumDescription("A girl between worlds", []),
     ]
-    songs, errors = get_songs(album_list)
-    x = create_playlist(songs, full_url=False)
+    album_songs = get_songs(album_list)
+    add_audio_features(album_songs)
+    x = create_playlist(album_songs, full_url=False)
     subscribe_to_playlist(x)
     print(x)

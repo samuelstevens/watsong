@@ -24,7 +24,7 @@ build/
 # other caches
 .mypy_cache/
 watsong/.cache*
-.cache-*
+.cache*
 
 # IDE-related, add as necessary
 .vscode/

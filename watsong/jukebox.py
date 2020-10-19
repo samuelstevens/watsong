@@ -32,16 +32,10 @@ def jukebox() -> Any:
                 return render_template("jukebox.html", songs=songs, dials=DIALS)
             spotify.cache(album_descs)
 
-            songs, err = spotify.get_songs(album_descs)
-            if err is not None:
-                flash(str(err))
-                return render_template("jukebox.html", songs=songs, dials=DIALS)
+            songs = spotify.get_songs(album_descs)
 
             random.shuffle(songs)
-            songs, err = spotify.add_audio_features(songs)
-            if err is not None:
-                flash(str(err))
-                return render_template("jukebox.html", songs=songs, dials=DIALS)
+            songs = spotify.add_audio_features(songs)
 
             session["songs"] = songs
 
