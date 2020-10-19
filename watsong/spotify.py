@@ -56,7 +56,7 @@ feature_memo = get_memo("features")
 
 
 def cache(
-        album_descriptions: List[AlbumDescription], sp: spotipy.Spotify = get_spotify()
+    album_descriptions: List[AlbumDescription], sp: spotipy.Spotify = get_spotify()
 ) -> None:
     """
     Cache the results for the given album descriptions for fast lookup later.
@@ -105,7 +105,7 @@ def cache(
 
 
 def find_album_id_from_search(
-        search: Dict[str, Any], artists: List[str]
+    search: Dict[str, Any], artists: List[str]
 ) -> Optional[str]:
     results = search["albums"]["items"]
 
@@ -124,7 +124,7 @@ def find_album_id_from_search(
 
 
 def album_from_title_artist(
-        title: str, artists: List[str], sp: spotipy.Spotify = get_spotify()
+    title: str, artists: List[str], sp: spotipy.Spotify = get_spotify()
 ) -> Optional[Album]:
     """
     Return an album
@@ -162,7 +162,7 @@ def album_from_title_artist(
 
 
 def get_songs(
-        album_descriptions: List[AlbumDescription], sp: spotipy.Spotify = get_spotify()
+    album_descriptions: List[AlbumDescription], sp: spotipy.Spotify = get_spotify()
 ) -> List[Song]:
     """
     Given a list of albums, find all the songs in those albums according to Spotify.
@@ -181,7 +181,7 @@ def get_songs(
 
 
 def add_audio_features(
-        songs: List[Song], sp: spotipy.Spotify = get_spotify()
+    songs: List[Song], sp: spotipy.Spotify = get_spotify()
 ) -> List[Song]:
     if not songs:
         return []
@@ -226,7 +226,7 @@ def filter_songs(feel: Feel, songs: List[Song], n: int = 25) -> List[Song]:
 
 
 def create_playlist(
-        songs: List[Song], full_url: bool = True, sp: spotipy.Spotify = get_spotify()
+    songs: List[Song], full_url: bool = True, sp: spotipy.Spotify = get_spotify()
 ) -> str:
     # Find the watsong playlist and use it if possible
     playlist = sp.user_playlist_create(
