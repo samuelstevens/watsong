@@ -1,6 +1,7 @@
 import os
 import json
 import sqlite3
+import random
 import training
 from spotify import get_playlist_features, get_playlist_ids
 from typing import Any, Tuple, Dict
@@ -37,12 +38,13 @@ def insert_mapping(conn: Any, document_mapping: Dict[int, str]) -> None:
     cur = conn.cursor()
     clear_col_query = r"UPDATE reviews SET documentID = NULL"
     add_col_query = r"ALTER TABLE reviews add documentID varchar(255)"
+    print(len(document_mapping))
     try:
         cur.execute(add_col_query)
     except OperationalError as e:
         print(e)
         print("Updating column")
-        cur.execute(clear_col_query)
+    cur.execute(clear_col_query)
     for review_id in document_mapping:
         query = f"UPDATE reviews SET documentID = \'{document_mapping[review_id]}\' WHERE reviews.reviewid = {review_id}"
         cur.execute(query)
@@ -51,25 +53,41 @@ def insert_mapping(conn: Any, document_mapping: Dict[int, str]) -> None:
 
 def train(conn, query, apikey: str, service_url: str, environment_id: str, collection_id: str, version: str = "2019-04-30"):
     cur = conn.cursor()
-    docs_query= r"SELECT documentID, title, artist from reviews where documentID"
+    docs_query= r"SELECT documentID, title, artist from reviews where documentID is not null"
     docs = cur.execute(docs_query)
-    try:
-        authenticator = IAMAuthenticator(apikey)
-        discovery = DiscoveryV1(version=version, authenticator=authenticator)
-        discovery.set_service_url(service_url)
 
-        examples = []
-        features = get_playlist_features(get_playlist_ids(query,3))
+    authenticator = IAMAuthenticator(apikey)
+    discovery = DiscoveryV1(version=version, authenticator=authenticator)
+    discovery.set_service_url(service_url)
 
-        for doc in docs:
-            example_obj = {}
+    examples = []
+    while True:
+        try:
+            features = get_playlist_features(get_playlist_ids(query,3))
+            break
+        except Exception:
+            continue
+
+    print(features)
+    sample = random.sample(list(docs),200)
+    count = 0
+
+    for doc in sample:
+        if count == 100:
+            break
+        example_obj = {}
+        try:
             score = training.gen_proc(features,doc[1:])
-            example_obj["relevance"] = score
-            example_obj["document_id"] = doc[0]
-            examples.append(example_obj)
-        print(examples)
-    except Exception as e:
-        print(e)
+            count += 1
+        except Exception as e:
+            print(e)
+            continue
+        example_obj["relevance"] = round(score*100)
+        example_obj["document_id"] = doc[0]
+        print(example_obj)
+        examples.append(example_obj)
+    print(examples)
+    discovery.add_training_data(environment_id, collection_id, natural_language_query=query, filter=None, examples=examples)
 
 
 
@@ -112,7 +130,7 @@ def main():
     database = r"dataset.sqlite"
     apikey = os.getenv("DISCOVERY_API_KEY")
     environment_id = "26e276ef-e35e-4076-a190-bab90b5a4521"
-    collection_id = "3789d265-dda2-465a-98fb-e804f1435317"
+    collection_id = "8a0447cb-01c3-48a1-8f5c-d9150f001975"
     service_url = "https://api.us-south.discovery.watson.cloud.ibm.com/instances/230365e2-48ca-4b2f-8a9e-3dba5fbe20ed"
     inp = input("Enter your query - ")
     # create a database connection

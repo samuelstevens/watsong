@@ -133,18 +133,11 @@ def album_from_title_artist(title: str, artists: List[str]) -> Optional[Album]:
     :return:
     """
     q = query(title, artists)
-    try:
-        search_result = search_memo[q]
-    except KeyError:
-        search_result = spcc.search(q, type="album", limit=50)
-        print(f"Key error looking up the query {q}")
+
+    search_result = spcc.search(q, type="album", limit=50)
     album_id = find_album_id_from_search(search_result, artists)
     if album_id:
-        try:
-            tracks = album_tracks_memo[album_id]
-        except KeyError:
-            tracks = spcc.album_tracks(album_id)
-            print(f"Key error looking up the track with id {album_id}")
+        tracks = spcc.album_tracks(album_id)
         return Album(
             title,
             album_id,
