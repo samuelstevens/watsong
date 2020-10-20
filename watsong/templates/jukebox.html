@@ -19,9 +19,9 @@
       <button class="chunky-button">Get Songs</button><button type="button" onclick="showPlaylist()" class="chunky-button">Show on Spotify</button>
     </form>
   </div>
-  <div style="height: 12px"></div>
+  <div class="gap"></div>
   <h2>Your Mix</h2>
-  <div id="playlist" style="box-shadow: inset 0 10px 12px rgba(0, 0, 0, 0.9); border-radius: 3px; background-color: #cbba83;">
+  <div id="playlist">
     {% if songs|length > 0 %}
     {% for song in songs %}
     <div class="song">
@@ -41,7 +41,7 @@
         <img src="{{ url_for('static', filename='images/dial-face.svg') }}" />
       </div>
       <img class="dial-shadow" src="{{ url_for('static', filename='images/dial-shadow.svg') }}" />
-      <div style="height: 12px"></div>
+      <div class="gap"></div>
       <span>{{ dial.lower().capitalize() }}</span>
     </div>
     {% endfor %}

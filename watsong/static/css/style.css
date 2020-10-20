@@ -1,3 +1,8 @@
+:root {
+  --main-bg-color: #ffecb3;
+  --main-bg-darker: #cbba83;
+}
+
 @font-face {
   font-family: "Sharpie";
   src: url("../fonts/AlphaMacAOE.ttf");
@@ -6,12 +11,12 @@
 * {
   margin: 0;
   padding: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
-    Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
 }
 
 body {
-  background-color: #ffecb3;
+  background-color: var(--main-bg-color);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+    Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
 }
 
 header {
@@ -46,14 +51,17 @@ img {
 
 #prompt input[type="text"] {
   width: calc(100% - 18px);
-  font-size: 1em;
+  font-size: 1.5em;
   padding: 8px;
   border: 0;
-  background-color: black;
-  font-family: "Courier New", Courier, monospace;
-  color: greenyellow;
+  background-color: var(--main-bg-darker);
+  font-family: Sharpie;
 }
 
 #prompt input[type="text"]:focus {
   outline: none;
+}
+
+.gap {
+  height: 12px;
 }

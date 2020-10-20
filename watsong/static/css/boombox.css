@@ -170,12 +170,15 @@ a:active::after {
 #playlist {
   height: max(200px, 40vh);
   overflow: scroll;
+  background-color: var(--main-bg-darker);
+  box-shadow: inset 0 10px 12px rgba(0, 0, 0, 0.9);
+  border-radius: 3px;
 }
 
 .song {
   margin: 15px;
   padding: 6px;
-  background-color: #fff8e1;
+  background-color: var(--main-bg-darker);
   border-radius: 3px;
   box-shadow: 0px 1px 3px black;
 }

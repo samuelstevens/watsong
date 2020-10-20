@@ -178,7 +178,7 @@ const StateModule = () => {
 };
 
 const GLOBAL = StateModule();
-const INITIAL_LEVEL = 0.02;
+const INITIAL_LEVEL = 0.5;
 
 $.each($('.dial'), function (_, elem) {
   const dial = $(elem).children('div')[0];
