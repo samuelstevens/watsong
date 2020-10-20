@@ -1,11 +1,11 @@
 """
 A file to communicate with the spotify API
 """
+import heapq
 import pickle
 from typing import Any, Dict, List, Optional
 
 import spotipy
-import heapq
 from spotipy.oauth2 import SpotifyOAuth
 
 from . import util

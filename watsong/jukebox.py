@@ -3,7 +3,7 @@ This is the main controller (called blueprints in Flask) for the application.
 """
 
 import random
-from typing import Any, List, cast
+from typing import Any, List
 
 from flask import Blueprint, flash, jsonify, render_template, request, session
 
