@@ -113,7 +113,7 @@ function setSongs(songs) {
 function showPlaylist() {
   $.getJSON($SCRIPT_ROOT + '/jukebox/showPlaylist', {}, function (playlist_id) {
     const url = 'https://open.spotify.com/embed/playlist/' + playlist_id;
-    pl = $("#playlist");
+    const pl = $("#playlist");
     pl.empty();
     pl.append('<iframe src="' + url + '" width="100%" height="380" frameborder="0" allowtransparency="true" allow="encrypted-media" id="spotify"></iframe>'
     );
