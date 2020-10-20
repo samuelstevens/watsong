@@ -26,7 +26,7 @@ def get_intervals(value, rng):
     return result
     
 
-def gen_proc(alb1, alb2):
+def gen_proc(features, alb):
     fields = {
         "danceability": [lambda x : (1050*(math.e**(-abs(x-0.6)**2/0.06)))/451, 1],
         "energy" : [lambda x: (715*(math.e**(-abs(x-0.76)**2/0.27)))/476.7, 1],
@@ -37,9 +37,8 @@ def gen_proc(alb1, alb2):
         "tempo": [lambda x: (1777.6*(math.e**(-(x-117.7)**2)/1212.1))/109692, 225],
     }
 
-    r1 = album_from_title_artist(alb1[0],alb1[1:]).spotify_id
-    r2 = album_from_title_artist(alb2[0],alb2[1:]).spotify_id
-    f1 = get_album_features([r1])
+    r2 = album_from_title_artist(alb[0],alb[1:]).spotify_id
+    f1 = features
     f2 = get_album_features([r2])
 
     dot = 0
@@ -50,7 +49,6 @@ def gen_proc(alb1, alb2):
         rng = get_intervals(f1[k],v[1])
         prob = integrate.quad(v[0],rng[0],rng[1])
         weight = 1-prob[0]
-        print(k,weight)
         if k == "tempo":
             f1[k], f2[k] = f1[k]/225, f2[k]/225
         elif k == "loudness":
@@ -62,5 +60,4 @@ def gen_proc(alb1, alb2):
 
     mag1 = mag1**0.5
     mag2 = mag2**0.5
-    print("Distance - ",dot/dr)
-    print(f1,"\n",f2)
+    return dot/dr
