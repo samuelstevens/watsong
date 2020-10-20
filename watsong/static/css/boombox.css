@@ -2,10 +2,8 @@
   --angle: 8px;
   --angle-hover: 7px;
   --angle-active: 4px;
-  --face: #fffdd0;
-  --side: #b7b69a;
-  --text: black;
 }
+
 /* https://codepen.io/screenthink/pen/ZeOyjP?editors=1100 */
 .chunky-button {
   margin-top: 12px;
@@ -18,14 +16,14 @@
   display: inline-block;
   padding: 15px 25px;
   border: 0;
-  background-color: var(--face);
+  background-color: var(--background-color-highlight);
 
   text-transform: uppercase;
-  color: var(--text);
+  color: black;
   font-weight: bolder;
   letter-spacing: 1px;
 
-  box-shadow: -6px 6px 0 var(--side);
+  box-shadow: -6px 6px 0 var(--background-color-shadow);
   text-decoration: none;
   z-index: auto;
 }
@@ -38,7 +36,7 @@
   left: -4px;
   width: var(--angle);
   height: var(--angle);
-  background-color: var(--side);
+  background-color: var(--background-color-shadow);
   transform: rotate(45deg);
   z-index: -1;
 }
@@ -51,7 +49,7 @@
   right: 2px;
   width: var(--angle);
   height: var(--angle);
-  background-color: var(--side);
+  background-color: var(--background-color-shadow);
   transform: rotate(45deg);
   z-index: -1;
 }
@@ -59,7 +57,7 @@
 .chunky-button:hover {
   top: 1px;
   left: -1px;
-  box-shadow: -5px 5px 0 var(--side);
+  box-shadow: -5px 5px 0 var(--background-color-shadow);
 }
 
 .chunky-button:hover::after {
@@ -79,7 +77,7 @@
 .chunky-button:active {
   top: 3px;
   left: -3px;
-  box-shadow: -3px 3px 0 var(--side);
+  box-shadow: -3px 3px 0 var(--background-color-shadow);
 }
 
 .chunky-button:active::after {
@@ -170,7 +168,7 @@ a:active::after {
 #playlist {
   height: max(200px, 40vh);
   overflow: scroll;
-  background-color: var(--main-bg-darker);
+  background-color: var(--background-color-shadow);
   box-shadow: inset 0 10px 12px rgba(0, 0, 0, 0.9);
   border-radius: 3px;
 }
@@ -178,7 +176,7 @@ a:active::after {
 .song {
   margin: 15px;
   padding: 6px;
-  background-color: var(--main-bg-darker);
+  background-color: var(--background-color-highlight);
   border-radius: 3px;
   box-shadow: 0px 1px 3px black;
 }
