@@ -111,21 +111,27 @@ function setSongs(songs) {
 }
 
 function showPlaylist() {
-  $.getJSON($SCRIPT_ROOT + '/jukebox/showPlaylist', {}, function (playlist_id) {
-    const url = 'https://open.spotify.com/embed/playlist/' + playlist_id;
-    const pl = $("#playlist");
-    pl.empty();
-    pl.append('<iframe src="' + url + '" width="100%" height="380" frameborder="0" allowtransparency="true" allow="encrypted-media" id="spotify"></iframe>'
-    );
-    const a = $("#jukebox_forms");
-    const old_button = a.find("#subscribe");
-    if (old_button.length) {
-      a.children().last().remove();
+  $.getJSON($SCRIPT_ROOT + '/jukebox/showPlaylist', {}, function (playlistId) {
+    const url = 'https://open.spotify.com/embed/playlist/' + playlistId;
+    const playlist = $("#playlist");
+    playlist.empty();
+    playlist.append(`<iframe src="${url}" width="100%" height="380" frameborder="0" allowtransparency="true" allow="encrypted-media" id="spotify"></iframe>`);
+
+    const button = $("#subscribe-button");
+    console.log(button.length);
+    if (button.length == 0) {
+      $("#jukebox-form").append(`<button type="button" class="chunky-button" onclick="subscribeToPlaylist()">Subscribe</button>`);
     }
-    /* This doesn't work yet */
-    a.append('<button class="chunky-button" id="subscribe" onclick="subscribePlaylist(playlist_id)"">' +
-      'Subscribe</button>');
-    console.log(playlist_id);
+
+    GLOBAL.setPlaylistId(playlistId);
+  });
+}
+
+function subscribeToPlaylist() {
+  const playlistId = GLOBAL.getPlaylistId();
+
+  $.getJSON($SCRIPT_ROOT + '/jukebox/subscribe', { playlistId }, ({ msg }) => {
+    alert(msg);
   });
 }
 
@@ -143,6 +149,7 @@ function songRawHTML(song) {
 
 const StateModule = () => {
   let feel = {};
+  let playlistId = null;
 
   /**
    * setFeel sets a field in `feel`
@@ -174,8 +181,26 @@ const StateModule = () => {
     return feelClone;
   };
 
+
+
+  /**
+   * Gets the global playlist id
+   * 
+   *  @return {string}
+   */
+  const getPlaylistId = () => playlistId;
+
+  /**
+   * Sets the global playlist id
+   *
+   * @param {string} newId new playlist id
+   */
+  const setPlaylistId = (newId) => {
+    playlistId = newId;
+  };
+
   return {
-    setFeel, getFeel
+    setFeel, getFeel, getPlaylistId, setPlaylistId
   };
 };
 

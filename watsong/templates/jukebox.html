@@ -14,9 +14,10 @@
     <h1 style="font-family: Sharpie;">Watsong</h1>
   </header>
   <div id="prompt">
-    <form action={{ url_for('jukebox.jukebox') }} method="post">
+    <form id="jukebox-form" action={{ url_for('jukebox.jukebox') }} method="post">
       <input type="text" placeholder="Beach tunes for 4th of July" name="query" autofocus>
-      <button class="chunky-button">Get Songs</button><button type="button" onclick="showPlaylist()" class="chunky-button">Show on Spotify</button>
+      <button class="chunky-button">Get Songs</button>
+      <button type="button" onclick="showPlaylist()" class="chunky-button">Show on Spotify</button>
     </form>
   </div>
   <div class="gap"></div>
