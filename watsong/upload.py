@@ -82,12 +82,7 @@ def train(conn, query, apikey: str, service_url: str, environment_id: str, colle
         except Exception as e:
             print(e)
             continue
-        if score>=.8:
-            example_obj["relevance"] = 2
-        elif score>.5:
-            example_obj["relevance"] = 1
-        else:
-            example_obj["relevance"] = 0
+        example_obj["relevance"] = round(score*100)
         example_obj["document_id"] = doc[0]
         print(example_obj)
         examples.append(example_obj)
