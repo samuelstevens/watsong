@@ -7,8 +7,8 @@ from typing import Any, Dict, List, Optional
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials, SpotifyOAuth
 
-from . import util
-from .structures import Album, AlbumDescription, Feel, Result, Song
+import util
+from structures import Album, AlbumDescription, Feel, Result, Song
 
 # These are also stored in the environment but it's easier to leave them here
 # since it causes some problems in how I run it if I use the envionment variables
@@ -362,34 +362,11 @@ def average_of_album_playlist_features(album_features: dict, playlist_features: 
 
     return average_features
 
-if __name__ == "__main__":
-    query = input("Input query: ")
-    count = input("Enter count of ids: ")
 
-    is_album_or_feature_input = input("Do you want features for albums or playlists?\n\t(0 = album, 1 = playlist, 2 = average of both, but takes a while): ")
-    is_album_or_feature = int(is_album_or_feature_input)
 
-    final_features = None
-    if (is_album_or_feature is 0):
-        album_ids = get_album_ids(query, count)
-        album_features = get_album_features(album_ids)
-        final_features = album_features
 
-    elif (is_album_or_feature == 1):
-        playlist_ids = get_playlist_ids(query, count)
-        playlist_features = get_playlist_features(playlist_ids)
+        
 
-        final_features = playlist_features
+    
 
-    elif (is_album_or_feature == 2):
-        album_ids = get_album_ids(query, count)
-        album_features = get_album_features(album_ids)
 
-        playlist_ids = get_playlist_ids(query, count)
-        playlist_features = get_playlist_features(playlist_ids)
-
-        final_features = average_of_album_playlist_features(album_features, playlist_features)
-
-    print("Features of songs: ")
-    print()
-    print(final_features)
