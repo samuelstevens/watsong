@@ -1,6 +1,6 @@
-from typing import Iterator, List
+from typing import Iterator, List, TypeVar
 
-from .structures import T
+T = TypeVar("T")
 
 
 def chunks(elements: Iterator[T], n: int) -> Iterator[List[T]]:

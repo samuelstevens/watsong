@@ -111,10 +111,21 @@ function setSongs(songs) {
 }
 
 function showPlaylist() {
-  $.getJSON($SCRIPT_ROOT + '/jukebox/showPlaylist', {}, function (data) {
-    $("#playlist").empty();
-    $("#playlist").append('<iframe src="' + data + '" width="100%" height="380" frameborder="0" allowtransparency="true" allow="encrypted-media" id="spotify"></iframe>'
+  $.getJSON($SCRIPT_ROOT + '/jukebox/showPlaylist', {}, function (playlist_id) {
+    const url = 'https://open.spotify.com/embed/playlist/' + playlist_id;
+    pl = $("#playlist");
+    pl.empty();
+    pl.append('<iframe src="' + url + '" width="100%" height="380" frameborder="0" allowtransparency="true" allow="encrypted-media" id="spotify"></iframe>'
     );
+    const a = $("#jukebox_forms");
+    const old_button = a.find("#subscribe");
+    if (old_button.length) {
+      a.children().last().remove();
+    }
+    /* This doesn't work yet */
+    a.append('<button class="chunky-button" id="subscribe" onclick="subscribePlaylist(playlist_id)"">' +
+      'Subscribe</button>');
+    console.log(playlist_id);
   });
 }
 
@@ -127,16 +138,7 @@ function showPlaylist() {
 function songRawHTML(song) {
   return `<div class="song"><p class="title">${song.title}</p><p class="artist">${song.artists.join(", ")}</p></div>`;
 }
-/*
-function showPlaylist(event) {
-  $.getJSON($SCRIPT_ROOT + '/jukebox/playlist', GLOBAL.getFeel(), (url) => {
-    const playlist = $('#playlist');
-    playlist.empty();
 
-    playlist.append(`<iframe src="${url}" width="100%" height="100%" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>`);
-  });
-}
-*/
 // MAIN
 
 const StateModule = () => {
@@ -162,7 +164,7 @@ const StateModule = () => {
   /**
    * getFeel returns a copy of the feel object
    *
-   * @return {*} 
+   * @return {*}
    */
   const getFeel = () => {
     const feelClone = {};

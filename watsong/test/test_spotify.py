@@ -2,13 +2,17 @@ import re
 
 from ..spotify import add_audio_features, create_playlist, filter_songs, get_songs
 from ..structures import AlbumDescription, Feel, Song
+from .spotify_mocks import SpotifyMockMaker
 
 
-def test_get_songs_single_artist_many_songs_without_features() -> None:
+def test_get_songs_many_songs_without_features() -> None:
     album_list = [
-        AlbumDescription("A girl between two worlds", ["Fatima Yamaha"]),
+        AlbumDescription("A girl between worlds", ["Fatima Yamaha"]),
     ]
-    songs, error = get_songs(album_list)
+    mock = SpotifyMockMaker.between_worlds_mock()
+    songs = get_songs(album_list, sp=mock)
+    mock.search.assert_called_with("A girl between worlds", limit=50, type="album")
+    mock.album_tracks.assert_called_with("4MGNcuX4Vvhv2hhn1FwtDW")
 
     assert songs[0] == {
         "title": "Between Worlds",
@@ -18,17 +22,16 @@ def test_get_songs_single_artist_many_songs_without_features() -> None:
     }
 
     assert len(songs) == 7
-    assert error is None
 
 
-def test_get_songs_single_artist_many_songs_with_features() -> None:
+def test_get_songs_many_songs_with_features() -> None:
     album_list = [
         AlbumDescription("A girl between two worlds", ["Fatima Yamaha"]),
     ]
-    songs, error = get_songs(album_list)
-    add_audio_features(songs)
-
-    # TODO: Change lyrics and melody values when making those additions
+    mock = SpotifyMockMaker.between_worlds_mock()
+    songs = get_songs(album_list, sp=mock)
+    add_audio_features(songs, sp=mock)
+    mock.audio_features.assert_called_with("spotify:track:6ezatiaJEBHpi72EjnTl9s")
     assert songs[0] == {
         "title": "Between Worlds",
         "uri": "spotify:track:0Vpdt3FsW8m7nC4FDk3rfw",
@@ -42,40 +45,23 @@ def test_get_songs_single_artist_many_songs_with_features() -> None:
     }
 
     assert len(songs) == 7
-    assert error is None
-
-
-def test_get_songs_multi_artist_one_song_without_features() -> None:
-    album_list = [
-        AlbumDescription("Harder", ["Jax Jones", "Bebe Rexha"]),
-    ]
-    songs, error = get_songs(album_list)
-
-    assert songs[0] == {
-        "title": "Harder (with Bebe Rexha)",
-        "uri": "spotify:track:5ieQrVW2U70NFMg28mzlqC",
-        "features": {},
-        "artists": ["Jax Jones", "Bebe Rexha"],
-    }
-    assert len(songs) == 1
-    assert error is None
 
 
 def test_create_playlist() -> None:
     album_list = [
         AlbumDescription("A girl between two worlds", ["Fatima Yamaha"]),
     ]
-    songs, errors = get_songs(album_list)
-    link1 = create_playlist(songs)
-
+    mock = SpotifyMockMaker.between_worlds_mock()
+    songs = get_songs(album_list, sp=mock)
+    link1 = create_playlist(songs, sp=mock)
+    mock.playlist_add_items.assert_called()
     assert re.match("https://open.spotify.com/embed/playlist/*", link1)
 
 
 def test_audio_features_no_songs() -> None:
-    annotated_songs, err = add_audio_features([])
+    annotated_songs = add_audio_features([])
 
     assert len(annotated_songs) == 0
-    assert err is None
 
 
 def test_filter_songs_empty_feel() -> None:

@@ -32,16 +32,10 @@ def jukebox() -> Any:
                 return render_template("jukebox.html", songs=songs, dials=DIALS)
             spotify.cache(album_descs)
 
-            songs, err = spotify.get_songs(album_descs)
-            if err is not None:
-                flash(str(err))
-                return render_template("jukebox.html", songs=songs, dials=DIALS)
+            songs = spotify.get_songs(album_descs)
 
             random.shuffle(songs)
-            songs, err = spotify.add_audio_features(songs)
-            if err is not None:
-                flash(str(err))
-                return render_template("jukebox.html", songs=songs, dials=DIALS)
+            songs = spotify.add_audio_features(songs)
 
             session["songs"] = songs
 
@@ -83,30 +77,11 @@ def showPlaylist() -> Any:
 
     songs = spotify.filter_songs(session["feel"], session["songs"])
 
-    url = spotify.create_playlist(songs)
-    print(url)
+    url = spotify.create_playlist(songs, full_url=False)
     return jsonify(url)
 
 
-"""
-@bp.route("/playlist", methods=["GET"])
-def playlist() -> Any:
-    
-    Take a request and its songs and filter them according to DIALS
-    
-
-    feel = Feel(
-        valence=request.args.get("valence", 1.0, type=float),
-        lyrics=request.args.get("lyrics", 1.0, type=float),
-        dance=request.args.get("dance", 1.0, type=float),
-        energy=request.args.get("energy", 1.0, type=float),
-    )
-
-    assert_feel(feel)
-
-    songs = spotify.filter_songs(session["feel"], session["songs"])
-
-    url = spotify.create_playlist(songs)
-
-    return jsonify(url)
-"""
+@bp.route("/subscribePlaylist", methods=["GET"])
+def subscribePlaylist(id: str) -> Any:
+    spotify.subscribe_to_playlist(id)
+    return None
