@@ -51,43 +51,45 @@ def insert_mapping(conn: Any, document_mapping: Dict[int, str]) -> None:
     return
 
 
-def train(conn, query, apikey: str, service_url: str, environment_id: str, collection_id: str, version: str = "2019-04-30"):
+def train(conn, queries, apikey: str, service_url: str, environment_id: str, collection_id: str, version: str = "2019-04-30"):
     cur = conn.cursor()
     docs_query= r"SELECT documentID, title, artist from reviews where documentID is not null"
-    docs = cur.execute(docs_query)
+    docs = list(cur.execute(docs_query))
 
     authenticator = IAMAuthenticator(apikey)
     discovery = DiscoveryV1(version=version, authenticator=authenticator)
     discovery.set_service_url(service_url)
 
-    examples = []
-    while True:
-        try:
-            features = get_playlist_features(get_playlist_ids(query,3))
-            break
-        except Exception:
-            continue
+    for query in queries:
+        print(query)
+        examples = []
+        while True:
+            try:
+                features = get_playlist_features(get_playlist_ids(query,3))
+                break
+            except Exception:
+                continue
 
-    print(features)
-    sample = random.sample(list(docs),200)
-    count = 0
+        print(features)
+        sample = random.sample(docs,200)
+        count = 0
 
-    for doc in sample:
-        if count == 100:
-            break
-        example_obj = {}
-        try:
-            score = training.gen_proc(features,doc[1:])
-            count += 1
-        except Exception as e:
-            print(e)
-            continue
-        example_obj["relevance"] = round(score*100)
-        example_obj["document_id"] = doc[0]
-        print(example_obj)
-        examples.append(example_obj)
-    print(examples)
-    discovery.add_training_data(environment_id, collection_id, natural_language_query=query, filter=None, examples=examples)
+        for doc in sample:
+            if count == 100:
+                break
+            example_obj = {}
+            try:
+                score = training.gen_proc(features,doc[1:])
+                count += 1
+            except Exception as e:
+                print(e)
+                continue
+            example_obj["relevance"] = round(score*100)
+            example_obj["document_id"] = doc[0]
+            print(example_obj)
+            examples.append(example_obj)
+        print(examples)
+        discovery.add_training_data(environment_id, collection_id, natural_language_query=query, filter=None, examples=examples)
 
 
 
@@ -132,11 +134,13 @@ def main():
     environment_id = "26e276ef-e35e-4076-a190-bab90b5a4521"
     collection_id = "8a0447cb-01c3-48a1-8f5c-d9150f001975"
     service_url = "https://api.us-south.discovery.watson.cloud.ibm.com/instances/230365e2-48ca-4b2f-8a9e-3dba5fbe20ed"
-    inp = input("Enter your query - ")
+    
+    with open("queries.txt","r") as f:
+        queries = f.readlines()
     # create a database connection
     conn = create_connection(database)
     with conn:
-        train(conn,inp,apikey,service_url,environment_id,collection_id)
+        train(conn,queries,apikey,service_url,environment_id,collection_id)
         # reviews = get_reviews(conn)
     conn.close()
     # document_mapping = upload_reviews(reviews, apikey, service_url, environment_id, collection_id)
