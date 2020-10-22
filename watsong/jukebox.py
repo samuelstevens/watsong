@@ -3,7 +3,7 @@ This is the main controller (called blueprints in Flask) for the application.
 """
 
 import random
-from typing import Any, List, cast
+from typing import Any, List
 
 from flask import Blueprint, flash, jsonify, render_template, request, session
 
@@ -81,7 +81,18 @@ def showPlaylist() -> Any:
     return jsonify(url)
 
 
-@bp.route("/subscribePlaylist", methods=["GET"])
-def subscribePlaylist(id: str) -> Any:
-    spotify.subscribe_to_playlist(id)
-    return None
+@bp.route("/subscribe", methods=["GET"])
+def subscribe() -> Any:
+    try:
+        result = {"msg": ""}
+
+        playlist_id = request.args.get("playlistId", type=str)
+        if not playlist_id:
+            result["msg"] = "No playlist id provided."
+            return jsonify(result)
+        spotify.subscribe_to_playlist(playlist_id)
+        result["msg"] = "Subscribed to playlist!"
+        return jsonify(result)
+    except Exception as e:
+        result["msg"] = str(e)
+        return jsonify(result)
