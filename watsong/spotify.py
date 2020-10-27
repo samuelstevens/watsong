@@ -244,11 +244,13 @@ def create_playlist(
         f'https://open.spotify.com/embed/playlist/{playlist["id"]}'
         if full_url
         else str(playlist["id"])
-    
+    )
+
 
 """Given a list of playlist/album ids find the net average 
 feature data (acousticness, danceability, energy, instrumentalness, liveness, loudness, speechiness, valence, tempo)
 for the entire collection of songs in the playlists/albums"""
+
 
 def get_album_features(ids: List[str]) -> Dict[str, float]:
     all_features = {
@@ -262,14 +264,14 @@ def get_album_features(ids: List[str]) -> Dict[str, float]:
         "instrumentalness": [],
         "liveness": [],
         "valence": [],
-        "tempo": []
+        "tempo": [],
     }
 
     for id in ids:
-        songsPerTrack = sp.album_tracks(id)['items']
+        songsPerTrack = sp.album_tracks(id)["items"]
 
         for song in songsPerTrack:
-            featuresForSong = sp.audio_features(song['uri'])
+            featuresForSong = sp.audio_features(song["uri"])
 
             for feature_type in featuresForSong[0].keys():
                 if feature_type in all_features.keys():
@@ -280,6 +282,7 @@ def get_album_features(ids: List[str]) -> Dict[str, float]:
         all_features[feature_name] = sum(values) / len(values)
 
     return all_features
+
 
 def get_playlist_features(ids: List[str]) -> Dict[str, float]:
     all_features = {
@@ -293,14 +296,14 @@ def get_playlist_features(ids: List[str]) -> Dict[str, float]:
         "instrumentalness": [],
         "liveness": [],
         "valence": [],
-        "tempo": []
+        "tempo": [],
     }
 
     for id in ids:
-        songsPerTrack = sp.playlist_tracks(id)['items']
+        songsPerTrack = sp.playlist_tracks(id)["items"]
 
         for song in songsPerTrack:
-            featuresForSong = sp.audio_features(song['track']['uri'])
+            featuresForSong = sp.audio_features(song["track"]["uri"])
 
             for feature_type in featuresForSong[0].keys():
                 if feature_type in all_features.keys():
@@ -312,15 +315,19 @@ def get_playlist_features(ids: List[str]) -> Dict[str, float]:
 
     return all_features
 
+
 """Return count album ids which are the most popular and relevant to the input query"""
+
+
 def get_album_ids(query: str, count: int) -> List[str]:
     result = sp.search(query, count, type="album")
 
     ids = []
-    for playlist in result['albums']['items']:
-        ids.append(playlist['id'])
+    for playlist in result["albums"]["items"]:
+        ids.append(playlist["id"])
 
     return ids
+
 
 """Return count playlist ids which are the most popular and relevant to the input query"""
 # Note @param count can be max 50
@@ -328,10 +335,11 @@ def get_playlist_ids(query: str, count: int) -> List[str]:
     result = sp.search(query, count, type="playlist")
 
     ids = []
-    for playlist in result['playlists']['items']:
-        ids.append(playlist['id'])
+    for playlist in result["playlists"]["items"]:
+        ids.append(playlist["id"])
 
     return ids
+
 
 def average_of_album_playlist_features(album_features: dict, playlist_features: dict):
     average_features = {
@@ -345,23 +353,18 @@ def average_of_album_playlist_features(album_features: dict, playlist_features: 
         "instrumentalness": None,
         "liveness": None,
         "valence": None,
-        "tempo": None
+        "tempo": None,
     }
 
     if len(set(album_features.keys()).difference(set(playlist_features.keys()))) == 0:
         feature_types = album_features.keys()
 
         for feature_name in feature_types:
-            average_features[feature_name] = (album_features[feature_name] + playlist_features[feature_name]) / 2
+            average_features[feature_name] = (
+                album_features[feature_name] + playlist_features[feature_name]
+            ) / 2
 
     return average_features
-
-
-
-
-        
-
-    
 
 
 def subscribe_to_playlist(id: str, sp: spotipy.Spotify = get_spotify()) -> None:

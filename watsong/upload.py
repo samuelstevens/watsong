@@ -34,6 +34,7 @@ def get_reviews(conn: Any) -> Tuple[Tuple[int, str, str, str]]:
 
     return cur.fetchall()
 
+
 def insert_mapping(conn: Any, document_mapping: Dict[int, str]) -> None:
     cur = conn.cursor()
     clear_col_query = r"UPDATE reviews SET documentID = NULL"
@@ -46,14 +47,24 @@ def insert_mapping(conn: Any, document_mapping: Dict[int, str]) -> None:
         print("Updating column")
     cur.execute(clear_col_query)
     for review_id in document_mapping:
-        query = f"UPDATE reviews SET documentID = \'{document_mapping[review_id]}\' WHERE reviews.reviewid = {review_id}"
+        query = f"UPDATE reviews SET documentID = '{document_mapping[review_id]}' WHERE reviews.reviewid = {review_id}"
         cur.execute(query)
     return
 
 
-def train(conn, queries, apikey: str, service_url: str, environment_id: str, collection_id: str, version: str = "2019-04-30"):
+def train(
+    conn,
+    queries,
+    apikey: str,
+    service_url: str,
+    environment_id: str,
+    collection_id: str,
+    version: str = "2019-04-30",
+):
     cur = conn.cursor()
-    docs_query= r"SELECT documentID, title, artist from reviews where documentID is not null"
+    docs_query = (
+        r"SELECT documentID, title, artist from reviews where documentID is not null"
+    )
     docs = list(cur.execute(docs_query))
 
     authenticator = IAMAuthenticator(apikey)
@@ -65,13 +76,13 @@ def train(conn, queries, apikey: str, service_url: str, environment_id: str, col
         examples = []
         while True:
             try:
-                features = get_playlist_features(get_playlist_ids(query,3))
+                features = get_playlist_features(get_playlist_ids(query, 3))
                 break
             except Exception:
                 continue
 
         print(features)
-        sample = random.sample(docs,200)
+        sample = random.sample(docs, 200)
         count = 0
 
         for doc in sample:
@@ -79,18 +90,23 @@ def train(conn, queries, apikey: str, service_url: str, environment_id: str, col
                 break
             example_obj = {}
             try:
-                score = training.gen_proc(features,doc[1:])
+                score = training.gen_proc(features, doc[1:])
                 count += 1
             except Exception as e:
                 print(e)
                 continue
-            example_obj["relevance"] = round(score*100)
+            example_obj["relevance"] = round(score * 100)
             example_obj["document_id"] = doc[0]
             print(example_obj)
             examples.append(example_obj)
         print(examples)
-        discovery.add_training_data(environment_id, collection_id, natural_language_query=query, filter=None, examples=examples)
-
+        discovery.add_training_data(
+            environment_id,
+            collection_id,
+            natural_language_query=query,
+            filter=None,
+            examples=examples,
+        )
 
 
 def upload_reviews(
@@ -134,13 +150,13 @@ def main():
     environment_id = "26e276ef-e35e-4076-a190-bab90b5a4521"
     collection_id = "8a0447cb-01c3-48a1-8f5c-d9150f001975"
     service_url = "https://api.us-south.discovery.watson.cloud.ibm.com/instances/230365e2-48ca-4b2f-8a9e-3dba5fbe20ed"
-    
-    with open("queries.txt","r") as f:
+
+    with open("queries.txt", "r") as f:
         queries = f.readlines()
     # create a database connection
     conn = create_connection(database)
     with conn:
-        train(conn,queries,apikey,service_url,environment_id,collection_id)
+        train(conn, queries, apikey, service_url, environment_id, collection_id)
         # reviews = get_reviews(conn)
     conn.close()
     # document_mapping = upload_reviews(reviews, apikey, service_url, environment_id, collection_id)
@@ -148,7 +164,6 @@ def main():
     # with conn:
     #     insert_mapping(conn, document_mapping)
     # conn.close()
-
 
 
 if __name__ == "__main__":
