@@ -1,4 +1,4 @@
-labaster==0.7.12
+alabaster==0.7.12
 appdirs==1.4.4
 atomicwrites==1.4.0
 attrs==20.2.0
