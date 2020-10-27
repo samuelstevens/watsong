@@ -110,6 +110,31 @@ function setSongs(songs) {
   });
 }
 
+function showPlaylist() {
+  $.getJSON($SCRIPT_ROOT + '/jukebox/showPlaylist', {}, function (playlistId) {
+    const url = 'https://open.spotify.com/embed/playlist/' + playlistId;
+    const playlist = $("#playlist");
+    playlist.empty();
+    playlist.append(`<iframe src="${url}" width="100%" height="380" frameborder="0" allowtransparency="true" allow="encrypted-media" id="spotify"></iframe>`);
+
+    const button = $("#subscribe-button");
+    console.log(button.length);
+    if (button.length == 0) {
+      $("#jukebox-form").append(`<button type="button" class="chunky-button" onclick="subscribeToPlaylist()">Subscribe</button>`);
+    }
+
+    GLOBAL.setPlaylistId(playlistId);
+  });
+}
+
+function subscribeToPlaylist() {
+  const playlistId = GLOBAL.getPlaylistId();
+
+  $.getJSON($SCRIPT_ROOT + '/jukebox/subscribe', { playlistId }, ({ msg }) => {
+    alert(msg);
+  });
+}
+
 /**
  * songRawHTML returns a raw HTML string representing the song element.
  *
@@ -120,20 +145,11 @@ function songRawHTML(song) {
   return `<div class="song"><p class="title">${song.title}</p><p class="artist">${song.artists.join(", ")}</p></div>`;
 }
 
-function showPlaylist(event) {
-  $.getJSON($SCRIPT_ROOT + '/jukebox/playlist', GLOBAL.getFeel(), (url) => {
-    const playlist = $('#playlist');
-
-    playlist.empty();
-
-    playlist.append(`<iframe src="${url}" width="100%" height="100%" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>`);
-  });
-}
-
 // MAIN
 
 const StateModule = () => {
   let feel = {};
+  let playlistId = null;
 
   /**
    * setFeel sets a field in `feel`
@@ -155,7 +171,7 @@ const StateModule = () => {
   /**
    * getFeel returns a copy of the feel object
    *
-   * @return {*} 
+   * @return {*}
    */
   const getFeel = () => {
     const feelClone = {};
@@ -165,13 +181,31 @@ const StateModule = () => {
     return feelClone;
   };
 
+
+
+  /**
+   * Gets the global playlist id
+   * 
+   *  @return {string}
+   */
+  const getPlaylistId = () => playlistId;
+
+  /**
+   * Sets the global playlist id
+   *
+   * @param {string} newId new playlist id
+   */
+  const setPlaylistId = (newId) => {
+    playlistId = newId;
+  };
+
   return {
-    setFeel, getFeel
+    setFeel, getFeel, getPlaylistId, setPlaylistId
   };
 };
 
 const GLOBAL = StateModule();
-const INITIAL_LEVEL = 0.02;
+const INITIAL_LEVEL = 0.5;
 
 $.each($('.dial'), function (_, elem) {
   const dial = $(elem).children('div')[0];

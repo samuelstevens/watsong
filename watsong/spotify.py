@@ -1,39 +1,33 @@
 """
-This file is a starter for whatever Spotify stuff needs to happen
+A file to communicate with the spotify API
 """
+import heapq
 import pickle
 from typing import Any, Dict, List, Optional
 
 import spotipy
-from spotipy.oauth2 import SpotifyClientCredentials, SpotifyOAuth
+from spotipy.oauth2 import SpotifyOAuth
 
-import util
-from structures import Album, AlbumDescription, Feel, Result, Song
+from . import util
+from .structures import Album, AlbumDescription, Feel, Song
 
 # These are also stored in the environment but it's easier to leave them here
-# since it causes some problems in how I run it if I use the envionment variables
-CLIENT_ID = "5d141ce6f09c4fbfa12d16ce9e5d40c1"
-CLIENT_SECRET = "52fed0d6564a4e6f8e596b78bd1abf62"
-USERNAME = "mo8wax9tenoczvhquxllzca37"
+# since it causes some problems in how I run it if I use the environment variables
+CLIENT_ID = "8170c7110cfb4503af349a6a8ea22fd3"
+CLIENT_SECRET = "0be6c71210bd495ab3f75e9b7f8a8935"
+USERNAME = "rp5ukikcsq2vjzakx29pxazlq"
 
-# If it doesn't work, try deleting the .cache file... will look for a more consistent solution
-# later. Actually it tends to work and just give an error message so it's not that bad.
-sp = spotipy.Spotify(
-    auth_manager=SpotifyOAuth(
-        client_id=CLIENT_ID,
-        client_secret=CLIENT_SECRET,
-        redirect_uri="http://localhost:8888/callback",
-        scope="playlist-modify-public playlist-modify-private",
-    )
-)
 
-# Client credentials for spotify. May be a bit faster to run.
-spcc = spotipy.Spotify(
-    auth_manager=SpotifyClientCredentials(
-        client_id=CLIENT_ID,
-        client_secret=CLIENT_SECRET,
+def get_spotify() -> spotipy.Spotify:
+    return spotipy.Spotify(
+        oauth_manager=SpotifyOAuth(
+            client_id=CLIENT_ID,
+            client_secret=CLIENT_SECRET,
+            redirect_uri="http://localhost:7233/callback",
+            scope="playlist-modify-public playlist-modify-private",
+            show_dialog=True,
+        )
     )
-)
 
 
 def query(title: str, artists: List[str]) -> str:
@@ -61,7 +55,9 @@ album_tracks_memo = get_memo("tracks")
 feature_memo = get_memo("features")
 
 
-def cache(album_descriptions: List[AlbumDescription]) -> None:
+def cache(
+    album_descriptions: List[AlbumDescription], sp: spotipy.Spotify = get_spotify()
+) -> None:
     """
     Cache the results for the given album descriptions for fast lookup later.
     Calling this before using the spotify methods on a list of albums will improve
@@ -77,7 +73,7 @@ def cache(album_descriptions: List[AlbumDescription]) -> None:
             search_result = search_memo[q]
         except KeyError:
             missed[0] = True
-            search_result = spcc.search(query(title, artists), type="album", limit=50)
+            search_result = sp.search(query(title, artists), type="album", limit=50)
             search_memo[q] = search_result
         album_id = find_album_id_from_search(search_result, artists)
         if album_id:
@@ -85,13 +81,13 @@ def cache(album_descriptions: List[AlbumDescription]) -> None:
                 album_tracks_memo[album_id] = album_tracks_memo[album_id]
             except KeyError:
                 missed[1] = True
-                album_tracks_memo[album_id] = spcc.album_tracks(album_id)
+                album_tracks_memo[album_id] = sp.album_tracks(album_id)
     if missed[0]:
         set_memo(search_memo, "search")
     if missed[1]:
         set_memo(album_tracks_memo, "tracks")
 
-    songs, err = get_songs(album_descriptions)
+    songs = get_songs(album_descriptions)
     for songs_chunk in util.chunks(iter(songs), 100):
         seenAllSongs = True
         song_links = [song["uri"] for song in songs_chunk]
@@ -100,7 +96,7 @@ def cache(album_descriptions: List[AlbumDescription]) -> None:
                 seenAllSongs = False
         if not seenAllSongs:
             missed[2] = True
-            feature_list = spcc.audio_features(song_links)
+            feature_list = sp.audio_features(song_links)
             for uri, features in zip(song_links, feature_list):
                 feature_memo[uri] = features
 
@@ -127,17 +123,26 @@ def find_album_id_from_search(
     return album_id
 
 
-def album_from_title_artist(title: str, artists: List[str]) -> Optional[Album]:
+def album_from_title_artist(
+    title: str, artists: List[str], sp: spotipy.Spotify = get_spotify()
+) -> Optional[Album]:
     """
     Return an album
     :return:
     """
     q = query(title, artists)
-
-    search_result = spcc.search(q, type="album", limit=50)
+    try:
+        search_result = search_memo[q]
+    except KeyError:
+        search_result = sp.search(q, type="album", limit=50)
+        print(f"Key error looking up the query {q}")
     album_id = find_album_id_from_search(search_result, artists)
     if album_id:
-        tracks = spcc.album_tracks(album_id)
+        try:
+            tracks = album_tracks_memo[album_id]
+        except KeyError:
+            tracks = sp.album_tracks(album_id)
+            print(f"Key error looking up the track with id {album_id}")
         return Album(
             title,
             album_id,
@@ -156,13 +161,15 @@ def album_from_title_artist(title: str, artists: List[str]) -> Optional[Album]:
     return None
 
 
-def get_songs(album_descriptions: List[AlbumDescription]) -> Result[List[Song]]:
+def get_songs(
+    album_descriptions: List[AlbumDescription], sp: spotipy.Spotify = get_spotify()
+) -> List[Song]:
     """
     Given a list of albums, find all the songs in those albums according to Spotify.
     """
     songs = []
     for title, artistList in album_descriptions:
-        result = album_from_title_artist(title, artistList)
+        result = album_from_title_artist(title, artistList, sp)
 
         if not result:
             continue
@@ -170,12 +177,14 @@ def get_songs(album_descriptions: List[AlbumDescription]) -> Result[List[Song]]:
         title, id, artists, tracks = result
         songs.extend(tracks)
 
-    return songs, None
+    return songs
 
 
-def add_audio_features(songs: List[Song]) -> Result[List[Song]]:
+def add_audio_features(
+    songs: List[Song], sp: spotipy.Spotify = get_spotify()
+) -> List[Song]:
     if not songs:
-        return [], None
+        return []
 
     annotated_songs = []
     feature_list = []
@@ -183,7 +192,7 @@ def add_audio_features(songs: List[Song]) -> Result[List[Song]]:
         try:
             features = feature_memo[song["uri"]]
         except KeyError:
-            features = spcc.audio_features(song["uri"])[0]
+            features = sp.audio_features(song["uri"])[0]
         feature_list.append(features)
 
     for song, features in zip(songs, feature_list):
@@ -197,52 +206,44 @@ def add_audio_features(songs: List[Song]) -> Result[List[Song]]:
         song["features"] = feel
         annotated_songs.append(song)
 
-    return annotated_songs, None
+    return annotated_songs
 
 
-def filter_songs(feel: Feel, song: Song) -> bool:
-    hasEnergy = False
-    hasDanceability = False
-    hasLyrics = False
-    hasValence = False
-    if song["features"]["energy"] >= feel["energy"]:
-        hasEnergy = True
+def filter_songs(feel: Feel, songs: List[Song], n: int = 25) -> List[Song]:
+    # Find the N songs closest to the given feel, measured by the L2 distance.
+    def dist(x: Song) -> float:
+        song_feel = x["features"]
+        diff = [
+            feel["energy"] - song_feel["energy"],
+            feel["dance"] - song_feel["dance"],
+            feel["lyrics"] - song_feel["lyrics"],
+            feel["valence"] - song_feel["valence"],
+        ]
+        return sum([d * d for d in diff])
 
-    if song["features"]["dance"] >= feel["dance"]:
-        hasDanceability = True
-
-    if song["features"]["lyrics"] >= feel["lyrics"]:
-        hasLyrics = True
-
-    if song["features"]["valence"] >= feel["valence"]:
-        hasValence = True
-
-    return hasEnergy and hasDanceability and hasLyrics and hasValence
+    print("First song in filter_songs: ", heapq.nsmallest(n, songs, key=dist)[0])
+    return heapq.nsmallest(n, songs, key=dist)
 
 
-def create_playlist(songs: List[Song]) -> str:
+def create_playlist(
+    songs: List[Song], full_url: bool = True, sp: spotipy.Spotify = get_spotify()
+) -> str:
     # Find the watsong playlist and use it if possible
-    playlists = sp.current_user_playlists()
-    watsong_list = [
-        playlist
-        for playlist in playlists["items"]
-        if playlist["name"] == "Watsong Playlist"
-    ]
-    if len(watsong_list):
-        # Get the first playlist named 'Watsong Playlist'
-        playlist = watsong_list[0]
-        # Clear it
-    else:
-        # If we can't find it, create a new one.
-        playlist = sp.user_playlist_create(
-            USERNAME,
-            "Watsong Playlist",
-            public=True,
-            collaborative=True,
-            description="A playlist created by watsong just for you",
-        )
-    sp.playlist_replace_items(playlist["id"], [song["uri"] for song in songs[:100]])
-    return f'https://open.spotify.com/embed/playlist/{playlist["id"]}'
+    playlist = sp.user_playlist_create(
+        sp.current_user()["id"],
+        "Watsong Playlist",
+        public=False,
+        collaborative=True,
+        description="A playlist created by watsong just for you",
+    )
+    sp.playlist_add_items(playlist["id"], [song["uri"] for song in songs[:100]])
+    # Unsubscribe from the playlist immediately. The user can subscribe later by hitting the
+    # Subscribe button.
+    sp.current_user_unfollow_playlist(playlist["id"])
+    return (
+        f'https://open.spotify.com/embed/playlist/{playlist["id"]}'
+        if full_url
+        else str(playlist["id"])
     
 
 """Given a list of playlist/album ids find the net average 
@@ -363,3 +364,19 @@ def average_of_album_playlist_features(album_features: dict, playlist_features: 
     
 
 
+def subscribe_to_playlist(id: str, sp: spotipy.Spotify = get_spotify()) -> None:
+    """
+    Take the current playlist and save it so that it isn't overwritten later.
+    """
+    sp.current_user_follow_playlist(id)
+
+
+if __name__ == "__main__":
+    album_list = [
+        AlbumDescription("A girl between worlds", []),
+    ]
+    album_songs = get_songs(album_list)
+    add_audio_features(album_songs)
+    x = create_playlist(album_songs, full_url=False)
+    subscribe_to_playlist(x)
+    print(x)

@@ -3,7 +3,7 @@ This is the main controller (called blueprints in Flask) for the application.
 """
 
 import random
-from typing import Any, List, cast
+from typing import Any, List
 
 from flask import Blueprint, flash, jsonify, render_template, request, session
 
@@ -32,27 +32,17 @@ def jukebox() -> Any:
                 return render_template("jukebox.html", songs=songs, dials=DIALS)
             spotify.cache(album_descs)
 
-            songs, err = spotify.get_songs(album_descs)
-            if err is not None:
-                flash(str(err))
-                return render_template("jukebox.html", songs=songs, dials=DIALS)
+            songs = spotify.get_songs(album_descs)
 
             random.shuffle(songs)
-            songs, err = spotify.add_audio_features(songs)
-            if err is not None:
-                flash(str(err))
-                return render_template("jukebox.html", songs=songs, dials=DIALS)
+            songs = spotify.add_audio_features(songs)
 
             session["songs"] = songs
 
             if "feel" not in session:
                 session["feel"] = default_feel()
 
-            songs = [
-                song
-                for song in cast(List[Song], session["songs"])
-                if spotify.filter_songs(session["feel"], song)
-            ]
+            songs = spotify.filter_songs(session["feel"], session["songs"])
 
     return render_template("jukebox.html", songs=songs, dials=DIALS)
 
@@ -62,7 +52,6 @@ def filter() -> Any:
     """
     Take a request and its songs and filter them according to DIALS
     """
-
     feel = Feel(
         valence=request.args.get("valence", 1.0, type=float),
         lyrics=request.args.get("lyrics", 1.0, type=float),
@@ -74,36 +63,36 @@ def filter() -> Any:
 
     assert_feel(feel)
 
-    songs = [
-        song
-        for song in cast(List[Song], session["songs"])
-        if spotify.filter_songs(feel, song)
-    ]
+    songs = spotify.filter_songs(session["feel"], session["songs"])
 
     return jsonify(songs)
 
 
-@bp.route("/playlist", methods=["GET"])
-def playlist() -> Any:
+@bp.route("/showPlaylist", methods=["GET"])
+def showPlaylist() -> Any:
     """
-    Take a request and its songs and filter them according to DIALS
+    Show embedded spotify playlist
     """
+    """url = spotify.create_playlist(session["songs"])"""
 
-    feel = Feel(
-        valence=request.args.get("valence", 1.0, type=float),
-        lyrics=request.args.get("lyrics", 1.0, type=float),
-        dance=request.args.get("dance", 1.0, type=float),
-        energy=request.args.get("energy", 1.0, type=float),
-    )
+    songs = spotify.filter_songs(session["feel"], session["songs"])
 
-    assert_feel(feel)
-
-    songs = [
-        song
-        for song in cast(List[Song], session["songs"])
-        if spotify.filter_songs(feel, song)
-    ][:100]
-
-    url = spotify.create_playlist(songs)
-
+    url = spotify.create_playlist(songs, full_url=False)
     return jsonify(url)
+
+
+@bp.route("/subscribe", methods=["GET"])
+def subscribe() -> Any:
+    try:
+        result = {"msg": ""}
+
+        playlist_id = request.args.get("playlistId", type=str)
+        if not playlist_id:
+            result["msg"] = "No playlist id provided."
+            return jsonify(result)
+        spotify.subscribe_to_playlist(playlist_id)
+        result["msg"] = "Subscribed to playlist!"
+        return jsonify(result)
+    except Exception as e:
+        result["msg"] = str(e)
+        return jsonify(result)
