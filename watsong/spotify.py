@@ -3,13 +3,13 @@ A file to communicate with the spotify API
 """
 import heapq
 import pickle
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Iterator, List, Optional, TypeVar
 
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 
-from . import util
 from .structures import Album, AlbumDescription, Feel, Song
+from . import util
 
 # These are also stored in the environment but it's easier to leave them here
 # since it causes some problems in how I run it if I use the environment variables
@@ -247,13 +247,13 @@ def create_playlist(
     )
 
 
-"""Given a list of playlist/album ids find the net average 
-feature data (acousticness, danceability, energy, instrumentalness, liveness, loudness, speechiness, valence, tempo)
-for the entire collection of songs in the playlists/albums"""
-
-
 def get_album_features(ids: List[str]) -> Dict[str, float]:
-    all_features = {
+    """
+    Given a list of playlist/album ids find the net average
+    feature data (acousticness, danceability, energy, instrumentalness, liveness, loudness, speechiness, valence, tempo) for the entire collection of songs in the playlists/albums
+    """
+
+    all_features: Dict[str, List[float]] = {
         "danceability": [],
         "energy": [],
         "key": [],
@@ -266,6 +266,8 @@ def get_album_features(ids: List[str]) -> Dict[str, float]:
         "valence": [],
         "tempo": [],
     }
+
+    sp = get_spotify()
 
     for id in ids:
         songsPerTrack = sp.album_tracks(id)["items"]
@@ -278,14 +280,15 @@ def get_album_features(ids: List[str]) -> Dict[str, float]:
                     value_of_feature = featuresForSong[0][feature_type]
                     all_features[feature_type].append(value_of_feature)
 
+    avg_features = {}
     for (feature_name, values) in all_features.items():
-        all_features[feature_name] = sum(values) / len(values)
+        avg_features[feature_name] = sum(values) / len(values)
 
-    return all_features
+    return avg_features
 
 
 def get_playlist_features(ids: List[str]) -> Dict[str, float]:
-    all_features = {
+    all_features: Dict[str, List[float]] = {
         "danceability": [],
         "energy": [],
         "key": [],
@@ -299,6 +302,8 @@ def get_playlist_features(ids: List[str]) -> Dict[str, float]:
         "tempo": [],
     }
 
+    sp = get_spotify()
+
     for id in ids:
         songsPerTrack = sp.playlist_tracks(id)["items"]
 
@@ -310,16 +315,18 @@ def get_playlist_features(ids: List[str]) -> Dict[str, float]:
                     value_of_feature = featuresForSong[0][feature_type]
                     all_features[feature_type].append(value_of_feature)
 
+    avg_features = {}
     for (feature_name, values) in all_features.items():
-        all_features[feature_name] = sum(values) / len(values)
+        avg_features[feature_name] = sum(values) / len(values)
 
-    return all_features
+    return avg_features
 
 
 """Return count album ids which are the most popular and relevant to the input query"""
 
 
 def get_album_ids(query: str, count: int) -> List[str]:
+    sp = get_spotify()
     result = sp.search(query, count, type="album")
 
     ids = []
@@ -329,9 +336,14 @@ def get_album_ids(query: str, count: int) -> List[str]:
     return ids
 
 
-"""Return count playlist ids which are the most popular and relevant to the input query"""
-# Note @param count can be max 50
 def get_playlist_ids(query: str, count: int) -> List[str]:
+    """
+    Return count playlist ids which are the most popular and relevant to the input query
+
+    Note @param count can be max 50
+    """
+
+    sp = get_spotify()
     result = sp.search(query, count, type="playlist")
 
     ids = []
@@ -341,8 +353,11 @@ def get_playlist_ids(query: str, count: int) -> List[str]:
     return ids
 
 
-def average_of_album_playlist_features(album_features: dict, playlist_features: dict):
-    average_features = {
+def average_of_album_playlist_features(
+    album_features: Dict[str, float],
+    playlist_features: Dict[str, float],
+) -> Dict[str, Optional[float]]:
+    average_features: Dict[str, Optional[float]] = {
         "danceability": None,
         "energy": None,
         "key": None,

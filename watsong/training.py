@@ -1,6 +1,7 @@
 import math
+
 import scipy.integrate as integrate
-from spotify import album_from_title_artist, get_album_features
+from .spotify import album_from_title_artist, get_album_features
 
 
 def get_intervals(value, rng):

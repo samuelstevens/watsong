@@ -1,14 +1,15 @@
-import os
 import json
-import sqlite3
+import os
 import random
-import training
-from spotify import get_playlist_features, get_playlist_ids
-from typing import Any, Tuple, Dict
-from sqlite3 import Error
-from sqlite3 import OperationalError
-from ibm_watson import DiscoveryV1
+import sqlite3
+from sqlite3 import Error, OperationalError
+from typing import Any, Dict, Tuple
+
 from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
+from ibm_watson import DiscoveryV1
+
+from . import training
+from .spotify import get_playlist_features, get_playlist_ids
 
 
 def create_connection(db_path: str) -> Any:
@@ -144,7 +145,7 @@ def upload_reviews(
     return document_mapping
 
 
-def main():
+def main() -> None:
     database = r"dataset.sqlite"
     apikey = os.getenv("DISCOVERY_API_KEY")
     environment_id = "26e276ef-e35e-4076-a190-bab90b5a4521"

@@ -1,7 +1,7 @@
 all: types format lint test
 
 types: FORCE
-	mypy --strict -p watsong
+	mypy --strict watsong/
 
 format: FORCE
 	isort watsong
