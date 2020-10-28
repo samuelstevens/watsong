@@ -1,23 +1,24 @@
 import math
 
 import scipy.integrate as integrate
+from typing import List, Dict, Any
 from .spotify import album_from_title_artist, get_album_features
 
 
-def get_intervals(value, rng):
+def get_intervals(value: float, rng: float) -> List[float]:
     neg = False
     if rng < 0:
         neg = True
-        rng *= -1
-        value *= -1
+        rng *= -1.0
+        value *= -1.0
 
-    offset = rng / 20
-    result = [0, 0]
+    offset = rng / 20.0
+    result = [0.0, 0.0]
     if value + offset > rng:
         result[1] = rng
         result[0] = value - offset - (value + offset - rng)
     elif value - offset < 0:
-        result[0] = 0
+        result[0] = 0.0
         result[1] = value + offset + (0 - value + offset)
     else:
         result[0] = value - offset
@@ -28,8 +29,8 @@ def get_intervals(value, rng):
     return result
 
 
-def gen_proc(features, alb):
-    fields = {
+def gen_proc(features: Dict[str, float], alb: List[str]) -> float:
+    fields: Dict[str, List[Any]] = {
         "danceability": [
             lambda x: (1050 * (math.e ** (-abs(x - 0.6) ** 2 / 0.06))) / 451,
             1,
@@ -54,14 +55,14 @@ def gen_proc(features, alb):
         ],
     }
 
-    r2 = album_from_title_artist(alb[0], alb[1:]).spotify_id
+    album = album_from_title_artist(alb[0], alb[1:])
+    if album is not None:
+        album_id = album.spotify_id
     f1 = features
-    f2 = get_album_features([r2])
+    f2 = get_album_features([album_id])
 
-    dot = 0
-    mag1 = 0
-    mag2 = 0
-    dr = 0
+    dot = 0.0
+    dr = 0.0
     for k, v in fields.items():
         rng = get_intervals(f1[k], v[1])
         prob = integrate.quad(v[0], rng[0], rng[1])
@@ -71,10 +72,6 @@ def gen_proc(features, alb):
         elif k == "loudness":
             f1[k], f2[k] = f1[k] / 60, f2[k] / 60
         dot += f1[k] * f2[k] * weight ** 1
-        mag1 += f1[k] * weight ** 1
-        mag2 += f2[k] * weight ** 1
         dr += (f1[k] ** 2 + f2[k] ** 2 - f1[k] * f2[k]) * weight ** 1
 
-    mag1 = mag1 ** 0.5
-    mag2 = mag2 ** 0.5
     return dot / dr

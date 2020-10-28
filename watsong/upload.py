@@ -3,7 +3,7 @@ import os
 import random
 import sqlite3
 from sqlite3 import Error, OperationalError
-from typing import Any, Dict, Tuple
+from typing import Any, Dict, Tuple, List, Optional
 
 from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
 from ibm_watson import DiscoveryV1
@@ -25,7 +25,7 @@ def create_connection(db_path: str) -> Any:
     return conn
 
 
-def get_reviews(conn: Any) -> Tuple[Tuple[int, str, str, str]]:
+def get_reviews(conn: Any) -> Any:
     """
     Get reviews from database
     """
@@ -54,14 +54,14 @@ def insert_mapping(conn: Any, document_mapping: Dict[int, str]) -> None:
 
 
 def train(
-    conn,
-    queries,
-    apikey: str,
+    conn: Any,
+    queries: List[str],
+    apikey: Optional[str],
     service_url: str,
     environment_id: str,
     collection_id: str,
     version: str = "2019-04-30",
-):
+) -> None:
     cur = conn.cursor()
     docs_query = (
         r"SELECT documentID, title, artist from reviews where documentID is not null"
@@ -112,7 +112,7 @@ def train(
 
 def upload_reviews(
     reviews: Tuple[Tuple[int, str, str, str]],
-    apikey: str,
+    apikey: Optional[str],
     service_url: str,
     environment_id: str,
     collection_id: str,
