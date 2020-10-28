@@ -254,6 +254,37 @@ def subscribe_to_playlist(id: str, sp: spotipy.Spotify = get_spotify()) -> None:
     sp.current_user_follow_playlist(id)
 
 
+def get_song_features_from_query(
+    query: str, sp: spotipy.Spotify = get_spotify()
+) -> Dict[str, float]:
+    all_features = {
+        "danceability": 0.0,
+        "energy": 0.0,
+        "speechiness": 0.0,
+        "acousticness": 0.0,
+        "instrumentalness": 0.0,
+        "liveness": 0.0,
+        "valence": 0.0,
+        "tempo": 0.0,
+    }
+
+    result = sp.search(query, type="track", limit=10)
+
+    tracks = result["tracks"]["items"]
+    numSongs = len(tracks)
+
+    for song in tracks:
+        track_features = sp.audio_features(song["uri"])[0]
+
+        for feature in all_features:
+            all_features[feature] = all_features[feature] + track_features[feature]
+
+    for feature in all_features:
+        all_features[feature] = all_features[feature] / numSongs
+
+    return all_features
+
+
 if __name__ == "__main__":
     album_list = [
         AlbumDescription("A girl between worlds", []),
