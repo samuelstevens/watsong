@@ -4,11 +4,11 @@ A file to communicate with the spotify API
 import heapq
 import pickle
 from typing import Any, Dict, Generic, List, Optional, cast
-from typing_extensions import TypedDict
 
 import flask
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
+from typing_extensions import TypedDict
 
 from . import util
 from .structures import Album, AlbumDescription, Feel, Song
