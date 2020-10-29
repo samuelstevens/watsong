@@ -2,9 +2,9 @@
 
 from unittest.mock import MagicMock
 
-from .. import webapp
-
 import spotipy
+
+from .. import webapp
 
 
 def test_config():

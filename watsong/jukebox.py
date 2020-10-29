@@ -7,12 +7,12 @@ from typing import Any, List
 
 from flask import (
     Blueprint,
+    current_app,
     flash,
     jsonify,
     render_template,
     request,
     session,
-    current_app,
 )
 
 from . import spotify, watson

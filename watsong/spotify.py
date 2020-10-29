@@ -3,15 +3,14 @@ A file to communicate with the spotify API
 """
 import heapq
 import pickle
-from typing import Any, Dict, List, Optional, cast, TypedDict, Generic
-import flask
+from typing import Any, Dict, Generic, List, Optional, TypedDict, cast
 
+import flask
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 
-from .structures import Album, AlbumDescription, Feel, Song
 from . import util
-
+from .structures import Album, AlbumDescription, Feel, Song
 from .test.spotify_mocks import between_worlds_mock
 
 # These are also stored in the environment but it's easier to leave them here
@@ -19,6 +18,8 @@ from .test.spotify_mocks import between_worlds_mock
 CLIENT_ID = "8170c7110cfb4503af349a6a8ea22fd3"
 CLIENT_SECRET = "0be6c71210bd495ab3f75e9b7f8a8935"
 USERNAME = "rp5ukikcsq2vjzakx29pxazlq"
+
+# region types
 
 
 class SpotifyFeatures(TypedDict):
@@ -44,14 +45,16 @@ class SpotifyAlbum(TypedDict):
 
 
 class HasItems(Generic[util.T]):
-    def __getitem__(
-        self, s: str
-    ) -> List[util.T]:  # represents ['items'] returning a list of something
+    def __getitem__(self, s: str) -> List[util.T]:
+        # represents ['items'] returning a list of something. Generic TypedDicts are not supported by MyPy yet.
         ...
 
 
 class SpotifySearch(TypedDict):
     albums: HasItems[SpotifyAlbum]
+
+
+# endregion
 
 
 def get_spotify() -> spotipy.Spotify:

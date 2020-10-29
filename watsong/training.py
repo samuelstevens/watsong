@@ -1,7 +1,8 @@
 import math
+from typing import Any, Dict, List
 
 import scipy.integrate as integrate
-from typing import List, Dict, Any
+
 from .spotify import album_from_title_artist, get_album_features, get_spotify
 
 
