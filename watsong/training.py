@@ -2,7 +2,7 @@ import math
 
 import scipy.integrate as integrate
 from typing import List, Dict, Any
-from .spotify import album_from_title_artist, get_album_features
+from .spotify import album_from_title_artist, get_album_features, get_spotify
 
 
 def get_intervals(value: float, rng: float) -> List[float]:
@@ -55,7 +55,7 @@ def gen_proc(features: Dict[str, float], alb: List[str]) -> float:
         ],
     }
 
-    album = album_from_title_artist(alb[0], alb[1:])
+    album = album_from_title_artist(alb[0], alb[1:], get_spotify())
     if album is not None:
         album_id = album.spotify_id
     f1 = features

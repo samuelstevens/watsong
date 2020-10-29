@@ -1,18 +1,23 @@
 import re
 
-from ..spotify import add_audio_features, create_playlist, filter_songs, get_songs
+from ..spotify import (
+    add_audio_features,
+    create_playlist,
+    filter_songs,
+    get_songs,
+    get_memo,
+)
 from ..structures import AlbumDescription, Feel, Song
-from .spotify_mocks import SpotifyMockMaker
+from .spotify_mocks import between_worlds_mock
 
 
 def test_get_songs_many_songs_without_features() -> None:
     album_list = [
         AlbumDescription("A girl between worlds", ["Fatima Yamaha"]),
     ]
-    mock = SpotifyMockMaker.between_worlds_mock()
+    mock = between_worlds_mock()
     songs = get_songs(album_list, sp=mock)
     mock.search.assert_called_with("A girl between worlds", limit=50, type="album")
-    mock.album_tracks.assert_called_with("4MGNcuX4Vvhv2hhn1FwtDW")
 
     assert songs[0] == {
         "title": "Between Worlds",
@@ -28,10 +33,10 @@ def test_get_songs_many_songs_with_features() -> None:
     album_list = [
         AlbumDescription("A girl between two worlds", ["Fatima Yamaha"]),
     ]
-    mock = SpotifyMockMaker.between_worlds_mock()
+    mock = between_worlds_mock()
     songs = get_songs(album_list, sp=mock)
     add_audio_features(songs, sp=mock)
-    mock.audio_features.assert_called_with("spotify:track:6ezatiaJEBHpi72EjnTl9s")
+
     assert songs[0] == {
         "title": "Between Worlds",
         "uri": "spotify:track:0Vpdt3FsW8m7nC4FDk3rfw",
@@ -51,7 +56,7 @@ def test_create_playlist() -> None:
     album_list = [
         AlbumDescription("A girl between two worlds", ["Fatima Yamaha"]),
     ]
-    mock = SpotifyMockMaker.between_worlds_mock()
+    mock = between_worlds_mock()
     songs = get_songs(album_list, sp=mock)
     link1 = create_playlist(songs, sp=mock)
     mock.playlist_add_items.assert_called()
@@ -59,7 +64,10 @@ def test_create_playlist() -> None:
 
 
 def test_audio_features_no_songs() -> None:
-    annotated_songs = add_audio_features([])
+    sp = between_worlds_mock()
+
+    annotated_songs = add_audio_features([], sp)
+    sp.audio_features.assert_not_called()
 
     assert len(annotated_songs) == 0
 
@@ -129,3 +137,28 @@ def test_filter_songs_choose_closer() -> None:
     )
     assert len(filtered) == 1
     assert filtered[0]["title"] == "1"
+
+
+def test_search_memo() -> None:
+    search_memo = get_memo("search")
+    assert isinstance(search_memo, dict)
+    if len(search_memo) == 0:
+        return
+
+    first_key, first_result = list(search_memo.items())[0]
+
+    assert isinstance(first_result, dict)
+    assert "albums" in first_result
+    assert "items" in first_result["albums"]
+
+    albums = first_result["albums"]["items"]
+
+    assert isinstance(albums, list)
+
+    if not albums:
+        return
+
+    first_album = albums[0]
+
+    assert "id" in first_album
+    assert "artists" in first_album
