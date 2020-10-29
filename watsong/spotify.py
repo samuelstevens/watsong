@@ -268,16 +268,20 @@ def get_song_features_from_query(
         "tempo": 0.0,
     }
 
-    result = sp.search(query, type="track", limit=10)
+    search_result = sp.search(query, type="track", limit=50)
 
-    tracks = result["tracks"]["items"]
+    tracks = search_result["tracks"]["items"]
     numSongs = len(tracks)
 
-    for song in tracks:
-        track_features = sp.audio_features(song["uri"])[0]
 
-        for feature in all_features:
-            all_features[feature] = all_features[feature] + track_features[feature]
+    song_links = [song["uri"] for song in tracks]
+    track_features = sp.audio_features(song_links)
+
+    for feature_json in track_features:
+        for feature in feature_json:
+            if feature in all_features.keys():
+                all_features[feature] = all_features[feature] + feature_json[feature]
+
 
     for feature in all_features:
         all_features[feature] = all_features[feature] / numSongs
