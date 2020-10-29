@@ -3,7 +3,8 @@ A file to communicate with the spotify API
 """
 import heapq
 import pickle
-from typing import Any, Dict, Generic, List, Optional, TypedDict, cast
+from typing import Any, Dict, Generic, List, Optional, cast
+from typing_extensions import TypedDict
 
 import flask
 import spotipy
