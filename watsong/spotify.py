@@ -3,7 +3,7 @@ A file to communicate with the spotify API
 """
 import heapq
 import pickle
-from typing import Any, Dict, Generic, List, Optional, cast
+from typing import Any, Dict, Generic, List, Optional
 
 import flask
 import spotipy
@@ -86,7 +86,7 @@ def query(title: str, artists: List[str]) -> str:
 def get_memo(name: str) -> Any:
     try:
         with open(f"{name}.pickle", "rb") as file:
-            return cast(Dict[str, Any], pickle.load(file))
+            return pickle.load(file)
     except (IOError, EOFError):
         return {}
 
