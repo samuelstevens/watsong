@@ -248,10 +248,10 @@ def create_playlist(
     )
 
 
-def logout():
+def logout() -> str:
     """
     Change who you are logged in as.
-    Return true on successful change, else return a string
+    Return "" on successful change, else return a string for the error
     """
     cache_file_path = f"{os.getcwd()}\\.cache"
     try:
@@ -262,6 +262,7 @@ def logout():
     sp = get_spotify()
     print(sp.current_user())
     return "You are now logged out."
+
 
 def get_album_features(ids: List[str]) -> Dict[str, float]:
     """

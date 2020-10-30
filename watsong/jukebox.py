@@ -3,7 +3,7 @@ This is the main controller (called blueprints in Flask) for the application.
 """
 
 import random
-from typing import Any, List
+from typing import Any, List, Dict, Union
 
 from flask import Blueprint, flash, jsonify, render_template, request, session
 
@@ -13,6 +13,7 @@ from .structures import Feel, Song, assert_feel, default_feel
 bp = Blueprint("jukebox", __name__, url_prefix="/jukebox")
 
 DIALS = ["dance", "lyrics", "energy", "valence"]
+
 
 @bp.route("/", methods=["GET", "POST"])
 def jukebox() -> Any:
@@ -96,14 +97,13 @@ def subscribe() -> Any:
 
 @bp.route("/logout", methods=["GET"])
 def logout() -> Any:
-    result = {}
+    result: Dict[str, Union[str, bool]] = {}
     try:
-        result['success'] = spotify.logout()
-        if result['success'] is not True:
-            result["msg"] = result['success']
-            result['success'] = False
+        result_str = spotify.logout()
+        result["success"] = result_str == ""
+        if not result["success"]:
+            result["msg"] = result_str
     except Exception as e:
-        result['success'] = False
-        result["msg"] = e
-    print("Oof")
+        result["success"] = False
+        result["msg"] = str(e)
     return jsonify(result)
