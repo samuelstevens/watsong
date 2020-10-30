@@ -3,6 +3,7 @@ A file to communicate with the spotify API
 """
 import heapq
 import pickle
+import os
 from typing import Any, Dict, List, Optional
 
 import spotipy
@@ -245,6 +246,22 @@ def create_playlist(
         if full_url
         else str(playlist["id"])
     )
+
+
+def logout():
+    """
+    Change who you are logged in as.
+    Return true on successful change, else return a string
+    """
+    cache_file_path = f"{os.getcwd()}\\.cache"
+    try:
+        os.remove(cache_file_path)
+    except FileNotFoundError:
+        pass
+    # Make the login prompt appear by calling an api function
+    sp = get_spotify()
+    print(sp.current_user())
+    return "You are now logged out."
 
 
 def subscribe_to_playlist(id: str, sp: spotipy.Spotify = get_spotify()) -> None:

@@ -14,7 +14,6 @@ bp = Blueprint("jukebox", __name__, url_prefix="/jukebox")
 
 DIALS = ["dance", "lyrics", "energy", "valence"]
 
-
 @bp.route("/", methods=["GET", "POST"])
 def jukebox() -> Any:
     """
@@ -73,8 +72,6 @@ def showPlaylist() -> Any:
     """
     Show embedded spotify playlist
     """
-    """url = spotify.create_playlist(session["songs"])"""
-
     songs = spotify.filter_songs(session["feel"], session["songs"])
 
     url = spotify.create_playlist(songs, full_url=False)
@@ -83,9 +80,8 @@ def showPlaylist() -> Any:
 
 @bp.route("/subscribe", methods=["GET"])
 def subscribe() -> Any:
+    result = {"msg": ""}
     try:
-        result = {"msg": ""}
-
         playlist_id = request.args.get("playlistId", type=str)
         if not playlist_id:
             result["msg"] = "No playlist id provided."
@@ -96,3 +92,18 @@ def subscribe() -> Any:
     except Exception as e:
         result["msg"] = str(e)
         return jsonify(result)
+
+
+@bp.route("/logout", methods=["GET"])
+def logout() -> Any:
+    result = {}
+    try:
+        result['success'] = spotify.logout()
+        if result['success'] is not True:
+            result["msg"] = result['success']
+            result['success'] = False
+    except Exception as e:
+        result['success'] = False
+        result["msg"] = e
+    print("Oof")
+    return jsonify(result)
