@@ -28,21 +28,25 @@ def jukebox() -> Any:
         if query:
             album_descs, err = watson.get_albums(query)
             if err is not None:
-                flash(str(err))
+                flash(str(err)) 
                 return render_template("jukebox.html", songs=songs, dials=DIALS)
-            spotify.cache(album_descs)
 
-            songs = spotify.get_songs(album_descs)
+            if album_descs: 
+                spotify.cache(album_descs)
 
-            random.shuffle(songs)
-            songs = spotify.add_audio_features(songs)
+                songs = spotify.get_songs(album_descs)
 
-            session["songs"] = songs
+                random.shuffle(songs)
+                songs = spotify.add_audio_features(songs)
 
-            if "feel" not in session:
-                session["feel"] = default_feel()
+                session["songs"] = songs
 
-            songs = spotify.filter_songs(session["feel"], session["songs"])
+                if "feel" not in session:
+                    session["feel"] = default_feel()
+
+                songs = spotify.filter_songs(session["feel"], session["songs"])
+            else:
+                print("invalid input")
 
     return render_template("jukebox.html", songs=songs, dials=DIALS)
 

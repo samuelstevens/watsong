@@ -12,7 +12,7 @@ from .structures import AlbumDescription, Result
 
 apikey = os.getenv("DISCOVERY_API_KEY")
 environment_id = "26e276ef-e35e-4076-a190-bab90b5a4521"
-collection_id = "8a0447cb-01c3-48a1-8f5c-d9150f001975"
+collection_id = "34216ed1-36fe-4236-b745-72743d96a9f0"
 service_url = "https://api.us-south.discovery.watson.cloud.ibm.com/instances/230365e2-48ca-4b2f-8a9e-3dba5fbe20ed"
 version = "2019-04-30"
 
@@ -29,7 +29,6 @@ def get_albums(query: str) -> Result[List[AlbumDescription]]:
     count = 50
     albums = []
     error = None
-
     try:
         response = discovery.query(
             environment_id,
