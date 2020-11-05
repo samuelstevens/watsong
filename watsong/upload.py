@@ -3,7 +3,7 @@ import os
 import random
 import sqlite3
 from sqlite3 import Error, OperationalError
-from typing import Any, Dict, Tuple, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
 from ibm_watson import DiscoveryV1
