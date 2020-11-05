@@ -1,0 +1,247 @@
+{
+  "id": "698aa1c9-3346-4389-af65-9da80cbb77bb",
+  "version": "2.0",
+  "name": "Watsong",
+  "url": "http://127.0.0.1:5000",
+  "tests": [{
+    "id": "ef3408ad-8e7d-4566-9f5c-3f3ba24aa4a1",
+    "name": "Happy Path",
+    "commands": [{
+      "id": "6089bdfe-68e1-4d47-9dcc-85824cb6cd26",
+      "comment": "",
+      "command": "open",
+      "target": "/jukebox/",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "71e77283-e077-46a7-aea7-1de7e217ef1c",
+      "comment": "",
+      "command": "setWindowSize",
+      "target": "929x720",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "cc3ef050-5def-42de-bf48-eb2d916b67a0",
+      "comment": "",
+      "command": "click",
+      "target": "name=query",
+      "targets": [
+        ["name=query", "name"],
+        ["css=input", "css:finder"],
+        ["xpath=//input[@name='query']", "xpath:attributes"],
+        ["xpath=//form[@id='jukebox-form']/input", "xpath:idRelative"],
+        ["xpath=//input", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "a766028c-52de-40e9-a3b7-d97713a7ac93",
+      "comment": "",
+      "command": "type",
+      "target": "name=query",
+      "targets": [
+        ["name=query", "name"],
+        ["css=input", "css:finder"],
+        ["xpath=//input[@name='query']", "xpath:attributes"],
+        ["xpath=//form[@id='jukebox-form']/input", "xpath:idRelative"],
+        ["xpath=//input", "xpath:position"]
+      ],
+      "value": "frat party music"
+    }, {
+      "id": "74a6651c-7708-4d2d-b2b1-de2decab57f4",
+      "comment": "",
+      "command": "click",
+      "target": "css=.chunky-button:nth-child(2)",
+      "targets": [
+        ["css=.chunky-button:nth-child(2)", "css:finder"],
+        ["xpath=//form[@id='jukebox-form']/button", "xpath:idRelative"],
+        ["xpath=//button", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "f352d0c3-8480-4a67-96b4-f8faabeafa36",
+      "comment": "",
+      "command": "click",
+      "target": "css=.chunky-button:nth-child(3)",
+      "targets": [
+        ["css=.chunky-button:nth-child(3)", "css:finder"],
+        ["xpath=//button[@type='button']", "xpath:attributes"],
+        ["xpath=//form[@id='jukebox-form']/button[2]", "xpath:idRelative"],
+        ["xpath=//button[2]", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "7e1ed25b-54d8-4288-a6cb-0cb1599f88b2",
+      "comment": "",
+      "command": "click",
+      "target": "css=.chunky-button:nth-child(4)",
+      "targets": [
+        ["css=.chunky-button:nth-child(4)", "css:finder"],
+        ["xpath=(//button[@type='button'])[2]", "xpath:attributes"],
+        ["xpath=//form[@id='jukebox-form']/button[3]", "xpath:idRelative"],
+        ["xpath=//button[3]", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "c34e17d6-6329-4eec-a700-98a12f0ad4ef",
+      "comment": "",
+      "command": "assertAlert",
+      "target": "Subscribed to playlist!",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "f0f0fa4a-80aa-44e3-82f5-b35f36d71705",
+      "comment": "",
+      "command": "mouseDownAt",
+      "target": "css=#dance > div > img",
+      "targets": [
+        ["css=#dance > div > img", "css:finder"],
+        ["xpath=//div[@id='dance']/div/img", "xpath:idRelative"],
+        ["xpath=//div/div/img", "xpath:position"]
+      ],
+      "value": "160.48333740234375,105.58331298828125"
+    }, {
+      "id": "25b92723-a0d6-4b3e-8837-711182094a91",
+      "comment": "",
+      "command": "mouseMoveAt",
+      "target": "css=#dance > div > img",
+      "targets": [
+        ["css=#dance > div > img", "css:finder"],
+        ["xpath=//div[@id='dance']/div/img", "xpath:idRelative"],
+        ["xpath=//div/div/img", "xpath:position"]
+      ],
+      "value": "160.48333740234375,105.58331298828125"
+    }, {
+      "id": "0b55be5b-bc27-466a-8c5f-128d6e17a1dd",
+      "comment": "",
+      "command": "mouseUpAt",
+      "target": "css=#dance > div > img",
+      "targets": [
+        ["css=#dance > div > img", "css:finder"],
+        ["xpath=//div[@id='dance']/div/img", "xpath:idRelative"],
+        ["xpath=//div/div/img", "xpath:position"]
+      ],
+      "value": "160.48333740234375,105.58331298828125"
+    }, {
+      "id": "c9994838-d8b1-4d93-9e4b-f43fc9e150b6",
+      "comment": "",
+      "command": "click",
+      "target": "css=#dance > div > img",
+      "targets": [
+        ["css=#dance > div > img", "css:finder"],
+        ["xpath=//div[@id='dance']/div/img", "xpath:idRelative"],
+        ["xpath=//div/div/img", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "e2ef120f-2263-462f-bf1b-73b1524e3d8b",
+      "comment": "",
+      "command": "mouseDownAt",
+      "target": "css=#lyrics > div > img",
+      "targets": [
+        ["css=#lyrics > div > img", "css:finder"],
+        ["xpath=//div[@id='lyrics']/div/img", "xpath:idRelative"],
+        ["xpath=//div[2]/div/img", "xpath:position"]
+      ],
+      "value": "187.1999969482422,103"
+    }, {
+      "id": "fd8280fc-a5e5-4a0a-9d61-dd14569e1fba",
+      "comment": "",
+      "command": "mouseMoveAt",
+      "target": "css=#lyrics > div > img",
+      "targets": [
+        ["css=#lyrics > div > img", "css:finder"],
+        ["xpath=//div[@id='lyrics']/div/img", "xpath:idRelative"],
+        ["xpath=//div[2]/div/img", "xpath:position"]
+      ],
+      "value": "187.1999969482422,103"
+    }, {
+      "id": "1a2b873b-efaf-4f15-aadd-9306cfb6204d",
+      "comment": "",
+      "command": "mouseUpAt",
+      "target": "css=#lyrics > div > img",
+      "targets": [
+        ["css=#lyrics > div > img", "css:finder"],
+        ["xpath=//div[@id='lyrics']/div/img", "xpath:idRelative"],
+        ["xpath=//div[2]/div/img", "xpath:position"]
+      ],
+      "value": "187.1999969482422,103"
+    }, {
+      "id": "9326fc90-319b-4e80-ad43-b9bd028f787f",
+      "comment": "",
+      "command": "click",
+      "target": "css=#lyrics > div > img",
+      "targets": [
+        ["css=#lyrics > div > img", "css:finder"],
+        ["xpath=//div[@id='lyrics']/div/img", "xpath:idRelative"],
+        ["xpath=//div[2]/div/img", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "3ae7ccde-e329-47aa-9e53-7d3190531cc0",
+      "comment": "",
+      "command": "mouseDownAt",
+      "target": "css=#valence > div > img",
+      "targets": [
+        ["css=#valence > div > img", "css:finder"],
+        ["xpath=//div[@id='valence']/div/img", "xpath:idRelative"],
+        ["xpath=//div[4]/div[4]/div[4]/div/img", "xpath:position"]
+      ],
+      "value": "149.88330078125,74.08331298828125"
+    }, {
+      "id": "c6820da9-8c1b-411d-a574-65dd3d5d599b",
+      "comment": "",
+      "command": "mouseMoveAt",
+      "target": "css=#valence > div > img",
+      "targets": [
+        ["css=#valence > div > img", "css:finder"],
+        ["xpath=//div[@id='valence']/div/img", "xpath:idRelative"],
+        ["xpath=//div[4]/div[4]/div[4]/div/img", "xpath:position"]
+      ],
+      "value": "149.88330078125,74.08331298828125"
+    }, {
+      "id": "585625da-a88c-4b23-93b3-297bcc60ed5e",
+      "comment": "",
+      "command": "mouseUpAt",
+      "target": "css=#valence > div > img",
+      "targets": [
+        ["css=#valence > div > img", "css:finder"],
+        ["xpath=//div[@id='valence']/div/img", "xpath:idRelative"],
+        ["xpath=//div[4]/div[4]/div[4]/div/img", "xpath:position"]
+      ],
+      "value": "149.88330078125,74.08331298828125"
+    }, {
+      "id": "5df6f5e7-3a42-44ee-9524-93febce1e998",
+      "comment": "",
+      "command": "click",
+      "target": "css=#valence > div > img",
+      "targets": [
+        ["css=#valence > div > img", "css:finder"],
+        ["xpath=//div[@id='valence']/div/img", "xpath:idRelative"],
+        ["xpath=//div[4]/div[4]/div[4]/div/img", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "6714ac55-c54c-40ae-b3dc-3d73b923e6b5",
+      "comment": "",
+      "command": "click",
+      "target": "css=.chunky-button:nth-child(3)",
+      "targets": [
+        ["css=.chunky-button:nth-child(3)", "css:finder"],
+        ["xpath=//button[@type='button']", "xpath:attributes"],
+        ["xpath=//form[@id='jukebox-form']/button[2]", "xpath:idRelative"],
+        ["xpath=//button[2]", "xpath:position"]
+      ],
+      "value": ""
+    }]
+  }],
+  "suites": [{
+    "id": "3d17d7fc-a05b-42de-8421-33fa3b0473cd",
+    "name": "Default Suite",
+    "persistSession": false,
+    "parallel": false,
+    "timeout": 300,
+    "tests": ["ef3408ad-8e7d-4566-9f5c-3f3ba24aa4a1"]
+  }],
+  "urls": ["http://127.0.0.1:5000/"],
+  "plugins": []
+}
