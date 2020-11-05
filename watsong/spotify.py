@@ -293,15 +293,16 @@ def create_playlist(
 def logout() -> str:
     """
     Change who you are logged in as.
-    Return "" on successful change, else return a string for the error
+    Return "" on successful change`, else return a string for the error
     """
-    cache_file_path = f"{os.getcwd()}\\.cache"
+    cache_file_path = os.path.join(os.getcwd(), ".cache")
     try:
         os.remove(cache_file_path)
     except FileNotFoundError:
         pass
     # Make the login prompt appear by calling an api function
     sp = get_spotify()
+    sp.current_user()
     return "You are now logged out."
 
 
