@@ -5,7 +5,15 @@ This is the main controller (called blueprints in Flask) for the application.
 import random
 from typing import Any, List, Dict, Union
 
-from flask import Blueprint, flash, jsonify, render_template, request, session
+from flask import (
+    Blueprint,
+    current_app,
+    flash,
+    jsonify,
+    render_template,
+    request,
+    session,
+)
 
 from . import spotify, watson
 from .structures import Feel, Song, assert_feel, default_feel
@@ -27,22 +35,40 @@ def jukebox() -> Any:
 
         if query:
             album_descs, err = watson.get_albums(query)
+            if len(album_descs) == 0:
+                flash("Your query was not descriptive enough to match to a song well. Try adding more descriptive words.")
+                return render_template("jukebox.html", songs=songs, dials=DIALS)
+
             if err is not None:
                 flash(str(err))
                 return render_template("jukebox.html", songs=songs, dials=DIALS)
-            spotify.cache(album_descs)
 
-            songs = spotify.get_songs(album_descs)
+            if not current_app.testing:
+                spotify.cache(album_descs, current_app.spotify)
+            try:
+                songs = spotify.get_songs(album_descs, current_app.spotify)
+            except Exception as e:
+                flash(str(e))
+                return render_template("jukebox.html", songs=songs, dials=DIALS)
+
 
             random.shuffle(songs)
-            songs = spotify.add_audio_features(songs)
+            try:
+                songs = spotify.add_audio_features(songs, current_app.spotify)
+            except Exception as e:
+                flash(str(e))
+                return render_template("jukebox.html", songs=songs, dials=DIALS)
 
             session["songs"] = songs
 
             if "feel" not in session:
                 session["feel"] = default_feel()
 
-            songs = spotify.filter_songs(session["feel"], session["songs"])
+            try:
+                songs = spotify.filter_songs(session["feel"], session["songs"])
+            except Exception as e:
+                flash(str(e))
+                return render_template("jukebox.html", songs=songs, dials=DIALS)
 
     return render_template("jukebox.html", songs=songs, dials=DIALS)
 
@@ -75,7 +101,7 @@ def showPlaylist() -> Any:
     """
     songs = spotify.filter_songs(session["feel"], session["songs"])
 
-    url = spotify.create_playlist(songs, full_url=False)
+    url = spotify.create_playlist(songs, current_app.spotify, full_url=False)
     return jsonify(url)
 
 
@@ -87,7 +113,7 @@ def subscribe() -> Any:
         if not playlist_id:
             result["msg"] = "No playlist id provided."
             return jsonify(result)
-        spotify.subscribe_to_playlist(playlist_id)
+        spotify.subscribe_to_playlist(playlist_id, current_app.spotify)
         result["msg"] = "Subscribed to playlist!"
         return jsonify(result)
     except Exception as e:

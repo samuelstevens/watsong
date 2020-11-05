@@ -5,7 +5,7 @@ from flask import Flask, redirect, url_for
 
 from flask_session import Session
 
-from . import jukebox
+from . import jukebox, spotify
 
 SESSION = Session()
 
@@ -35,12 +35,13 @@ def create_app(test_config: Optional[Any] = None) -> Flask:
         return redirect(url_for("jukebox.jukebox"))
 
     app.config.update(
-        # SESSION_COOKIE_SECURE=True,
-        # SESSION_COOKIE_HTTPONLY=True,
+        SESSION_COOKIE_SECURE=True,
+        SESSION_COOKIE_HTTPONLY=True,
         SESSION_COOKIE_SAMESITE="Lax",
         SESSION_TYPE="filesystem",
     )
 
     SESSION.init_app(app)
+    spotify.init_app(app)  # adds client to app
 
     return app
