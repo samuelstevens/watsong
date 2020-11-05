@@ -3,13 +3,13 @@ A file to communicate with the spotify API
 """
 import heapq
 import pickle
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Iterator, List, Optional, TypeVar
 
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 
-from . import util
 from .structures import Album, AlbumDescription, Feel, Song
+from . import util
 
 # These are also stored in the environment but it's easier to leave them here
 # since it causes some problems in how I run it if I use the environment variables
@@ -247,11 +247,177 @@ def create_playlist(
     )
 
 
+def get_album_features(ids: List[str]) -> Dict[str, float]:
+    """
+    Given a list of playlist/album ids find the net average
+    feature data (acousticness, danceability, energy, instrumentalness, liveness, loudness, speechiness, valence, tempo) for the entire collection of songs in the playlists/albums
+    """
+
+    all_features: Dict[str, List[float]] = {
+        "danceability": [],
+        "energy": [],
+        "key": [],
+        "loudness": [],
+        "mode": [],
+        "speechiness": [],
+        "acousticness": [],
+        "instrumentalness": [],
+        "liveness": [],
+        "valence": [],
+        "tempo": [],
+    }
+
+    sp = get_spotify()
+
+    for id in ids:
+        songsPerTrack = sp.album_tracks(id)["items"]
+
+        for song in songsPerTrack:
+            featuresForSong = sp.audio_features(song["uri"])
+
+            for feature_type in featuresForSong[0].keys():
+                if feature_type in all_features.keys():
+                    value_of_feature = featuresForSong[0][feature_type]
+                    all_features[feature_type].append(value_of_feature)
+
+    avg_features = {}
+    for (feature_name, values) in all_features.items():
+        avg_features[feature_name] = sum(values) / len(values)
+
+    return avg_features
+
+
+def get_playlist_features(ids: List[str]) -> Dict[str, float]:
+    all_features: Dict[str, List[float]] = {
+        "danceability": [],
+        "energy": [],
+        "key": [],
+        "loudness": [],
+        "mode": [],
+        "speechiness": [],
+        "acousticness": [],
+        "instrumentalness": [],
+        "liveness": [],
+        "valence": [],
+        "tempo": [],
+    }
+
+    sp = get_spotify()
+
+    for id in ids:
+        songsPerTrack = sp.playlist_tracks(id)["items"]
+
+        for song in songsPerTrack:
+            featuresForSong = sp.audio_features(song["track"]["uri"])
+
+            for feature_type in featuresForSong[0].keys():
+                if feature_type in all_features.keys():
+                    value_of_feature = featuresForSong[0][feature_type]
+                    all_features[feature_type].append(value_of_feature)
+
+    avg_features = {}
+    for (feature_name, values) in all_features.items():
+        avg_features[feature_name] = sum(values) / len(values)
+
+    return avg_features
+
+
+"""Return count album ids which are the most popular and relevant to the input query"""
+
+
+def get_album_ids(query: str, count: int) -> List[str]:
+    sp = get_spotify()
+    result = sp.search(query, count, type="album")
+
+    ids = []
+    for playlist in result["albums"]["items"]:
+        ids.append(playlist["id"])
+
+    return ids
+
+
+def get_playlist_ids(query: str, count: int) -> List[str]:
+    """
+    Return count playlist ids which are the most popular and relevant to the input query
+
+    Note @param count can be max 50
+    """
+
+    sp = get_spotify()
+    result = sp.search(query, count, type="playlist")
+
+    ids = []
+    for playlist in result["playlists"]["items"]:
+        ids.append(playlist["id"])
+
+    return ids
+
+
+def average_of_album_playlist_features(
+    album_features: Dict[str, float],
+    playlist_features: Dict[str, float],
+) -> Dict[str, Optional[float]]:
+    average_features: Dict[str, Optional[float]] = {
+        "danceability": None,
+        "energy": None,
+        "key": None,
+        "loudness": None,
+        "mode": None,
+        "speechiness": None,
+        "acousticness": None,
+        "instrumentalness": None,
+        "liveness": None,
+        "valence": None,
+        "tempo": None,
+    }
+
+    if len(set(album_features.keys()).difference(set(playlist_features.keys()))) == 0:
+        feature_types = album_features.keys()
+
+        for feature_name in feature_types:
+            average_features[feature_name] = (
+                album_features[feature_name] + playlist_features[feature_name]
+            ) / 2
+
+    return average_features
+
+
 def subscribe_to_playlist(id: str, sp: spotipy.Spotify = get_spotify()) -> None:
     """
     Take the current playlist and save it so that it isn't overwritten later.
     """
     sp.current_user_follow_playlist(id)
+
+
+def get_song_features_from_query(
+    query: str, sp: spotipy.Spotify = get_spotify()
+) -> Dict[str, float]:
+    all_features = {
+        "danceability": 0.0,
+        "energy": 0.0,
+        "speechiness": 0.0,
+        "acousticness": 0.0,
+        "instrumentalness": 0.0,
+        "liveness": 0.0,
+        "valence": 0.0,
+        "tempo": 0.0,
+    }
+
+    result = sp.search(query, type="track", limit=10)
+
+    tracks = result["tracks"]["items"]
+    numSongs = len(tracks)
+
+    for song in tracks:
+        track_features = sp.audio_features(song["uri"])[0]
+
+        for feature in all_features:
+            all_features[feature] = all_features[feature] + track_features[feature]
+
+    for feature in all_features:
+        all_features[feature] = all_features[feature] / numSongs
+
+    return all_features
 
 
 if __name__ == "__main__":
