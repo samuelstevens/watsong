@@ -45,6 +45,10 @@ def jukebox() -> Any:
                 flash(str(err))
                 return render_template("jukebox.html", songs=songs, dials=DIALS)
 
+            if not album_descs:
+                flash("Invalid input")
+                return render_template("jukebox.html", songs=songs, dials=DIALS)
+
             if not current_app.testing:
                 spotify.cache(album_descs, current_app.spotify)
             try:

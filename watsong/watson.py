@@ -29,7 +29,6 @@ def get_albums(query: str) -> Result[List[AlbumDescription]]:
     count = 50
     albums = []
     error = None
-
     try:
         response = discovery.query(
             environment_id,
