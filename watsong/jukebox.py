@@ -5,7 +5,15 @@ This is the main controller (called blueprints in Flask) for the application.
 import random
 from typing import Any, List
 
-from flask import Blueprint, flash, jsonify, render_template, request, session
+from flask import (
+    Blueprint,
+    current_app,
+    flash,
+    jsonify,
+    render_template,
+    request,
+    session,
+)
 
 from . import spotify, watson
 from .structures import Feel, Song, assert_feel, default_feel
@@ -27,26 +35,29 @@ def jukebox() -> Any:
 
         if query:
             album_descs, err = watson.get_albums(query)
+
             if err is not None:
-                flash(str(err)) 
+                flash(str(err))
                 return render_template("jukebox.html", songs=songs, dials=DIALS)
 
-            if album_descs: 
-                spotify.cache(album_descs)
+            if not album_descs:
+                flash("Invalid input")
+                return render_template("jukebox.html", songs=songs, dials=DIALS)
 
-                songs = spotify.get_songs(album_descs)
+            if not current_app.testing:
+                spotify.cache(album_descs, current_app.spotify)
 
-                random.shuffle(songs)
-                songs = spotify.add_audio_features(songs)
+            songs = spotify.get_songs(album_descs, current_app.spotify)
 
-                session["songs"] = songs
+            random.shuffle(songs)
+            songs = spotify.add_audio_features(songs, current_app.spotify)
 
-                if "feel" not in session:
-                    session["feel"] = default_feel()
+            session["songs"] = songs
 
-                songs = spotify.filter_songs(session["feel"], session["songs"])
-            else:
-                print("invalid input")
+            if "feel" not in session:
+                session["feel"] = default_feel()
+
+            songs = spotify.filter_songs(session["feel"], session["songs"])
 
     return render_template("jukebox.html", songs=songs, dials=DIALS)
 
@@ -81,7 +92,7 @@ def showPlaylist() -> Any:
 
     songs = spotify.filter_songs(session["feel"], session["songs"])
 
-    url = spotify.create_playlist(songs, full_url=False)
+    url = spotify.create_playlist(songs, current_app.spotify, full_url=False)
     return jsonify(url)
 
 
@@ -94,7 +105,7 @@ def subscribe() -> Any:
         if not playlist_id:
             result["msg"] = "No playlist id provided."
             return jsonify(result)
-        spotify.subscribe_to_playlist(playlist_id)
+        spotify.subscribe_to_playlist(playlist_id, current_app.spotify)
         result["msg"] = "Subscribed to playlist!"
         return jsonify(result)
     except Exception as e:
