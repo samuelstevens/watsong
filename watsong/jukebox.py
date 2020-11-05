@@ -36,7 +36,9 @@ def jukebox() -> Any:
         if query:
             album_descs, err = watson.get_albums(query)
             if len(album_descs) == 0:
-                flash("Your query was not descriptive enough to match to a song well. Try adding more descriptive words.")
+                flash(
+                    "Your query was not descriptive enough to match to a song well. Try adding more descriptive words."
+                )
                 return render_template("jukebox.html", songs=songs, dials=DIALS)
 
             if err is not None:
@@ -50,7 +52,6 @@ def jukebox() -> Any:
             except Exception as e:
                 flash(str(e))
                 return render_template("jukebox.html", songs=songs, dials=DIALS)
-
 
             random.shuffle(songs)
             try:

@@ -146,8 +146,9 @@ def cache(album_descriptions: List[AlbumDescription], sp: spotipy.Spotify) -> No
         set_memo(feature_memo, "features")
 
 
-def find_album_id_from_search(search: SpotifySearch,
-                              artists: List[str]) -> Optional[str]:
+def find_album_id_from_search(
+    search: SpotifySearch, artists: List[str]
+) -> Optional[str]:
     results = search["albums"]["items"]
 
     album_id = None
@@ -165,7 +166,7 @@ def find_album_id_from_search(search: SpotifySearch,
 
 
 def album_from_title_artist(
-        title: str, artists: List[str], sp: spotipy.Spotify
+    title: str, artists: List[str], sp: spotipy.Spotify
 ) -> Optional[Album]:
     """
     Return an album
@@ -204,7 +205,7 @@ def album_from_title_artist(
 
 
 def get_songs(
-        album_descriptions: List[AlbumDescription], sp: spotipy.Spotify
+    album_descriptions: List[AlbumDescription], sp: spotipy.Spotify
 ) -> List[Song]:
     """
     Given a list of albums, find all the songs in those albums according to Spotify.
@@ -266,9 +267,9 @@ def filter_songs(feel: Feel, songs: List[Song], n: int = 25) -> List[Song]:
 
 
 def create_playlist(
-        songs: List[Song],
-        sp: spotipy.Spotify,
-        full_url: bool = True,
+    songs: List[Song],
+    sp: spotipy.Spotify,
+    full_url: bool = True,
 ) -> str:
     # Find the watsong playlist and use it if possible
     playlist = sp.user_playlist_create(
@@ -411,8 +412,8 @@ def get_playlist_ids(query: str, count: int) -> List[str]:
 
 
 def average_of_album_playlist_features(
-        album_features: Dict[str, float],
-        playlist_features: Dict[str, float],
+    album_features: Dict[str, float],
+    playlist_features: Dict[str, float],
 ) -> Dict[str, Optional[float]]:
     average_features: Dict[str, Optional[float]] = {
         "danceability": None,
@@ -433,8 +434,8 @@ def average_of_album_playlist_features(
 
         for feature_name in feature_types:
             average_features[feature_name] = (
-                                                     album_features[feature_name] + playlist_features[feature_name]
-                                             ) / 2
+                album_features[feature_name] + playlist_features[feature_name]
+            ) / 2
 
     return average_features
 
