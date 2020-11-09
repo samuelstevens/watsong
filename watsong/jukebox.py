@@ -20,7 +20,7 @@ from .structures import Feel, Song, assert_feel, default_feel
 
 bp = Blueprint("jukebox", __name__, url_prefix="/jukebox")
 
-DIALS = ["dance", "lyrics", "energy", "valence"]
+DIALS = ["dance", "lyrics", "energy", "happiness"]
 
 
 @bp.route("/", methods=["GET", "POST"])
@@ -84,10 +84,10 @@ def filter() -> Any:
     Take a request and its songs and filter them according to DIALS
     """
     feel = Feel(
-        valence=request.args.get("valence", 1.0, type=float),
-        lyrics=request.args.get("lyrics", 1.0, type=float),
-        dance=request.args.get("dance", 1.0, type=float),
-        energy=request.args.get("energy", 1.0, type=float),
+        valence=request.args.get("valence", .5, type=float),
+        lyrics=request.args.get("lyrics", .5, type=float),
+        dance=request.args.get("dance", .5, type=float),
+        energy=request.args.get("energy", .5, type=float),
     )
 
     session["feel"] = feel

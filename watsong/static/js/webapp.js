@@ -122,11 +122,9 @@ function showPlaylist() {
             const playlist = $("#playlist");
             playlist.empty();
             playlist.append(`<iframe src="${url}" width="100%" height="380" frameborder="0" allowtransparency="true" allow="encrypted-media" id="spotify"></iframe>`);
-
             const button = $("#subscribe-button");
-            console.log(button.length);
-            if (button.length == 0) {
-                $("#jukebox-form").append(`<button type="button" class="chunky-button" onclick="subscribeToPlaylist()">Subscribe</button>`);
+            if (button.length === 0) {
+                $("#jukebox-form").append(`<button type="button" id="subscribe-button" class="chunky-button" onclick="subscribeToPlaylist()">Subscribe</button>`);
             }
 
             GLOBAL.setPlaylistId(playlistId);
@@ -208,8 +206,10 @@ const StateModule = () => {
 
 
         if (!skipRequest) {
-            console.log(`Making request with ${feel}.`);
             $.getJSON($SCRIPT_ROOT + '/jukebox/filter', feel, setSongs);
+            const select = $("#" + field + "_value");
+            console.log(select)
+            select[0].innerText = Math.round(100*value) + '%'
         }
     };
 

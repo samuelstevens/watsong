@@ -45,6 +45,7 @@
                     <img class="dial-shadow" src="{{ url_for('static', filename='images/dial-shadow.svg') }}"/>
                     <div class="gap"></div>
                     <span>{{ dial.lower().capitalize() }}</span>
+                    <span id="{{ dial }}_value">50%</span>
                 </div>
             {% endfor %}
         </div>
