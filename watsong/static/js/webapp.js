@@ -134,7 +134,7 @@ function displayName(){
     playlistTitle.append(document.getElementById("searchbar").value);
 
     // Add Dial values
-    playlistTitle.append("")
+    //playlistTitle.append("Energy: Dance: Lyrics: Valence: Artists: ");
 }
 function subscribeToPlaylist() {
   const playlistId = GLOBAL.getPlaylistId();

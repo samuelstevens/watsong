@@ -29,7 +29,7 @@ def jukebox() -> Any:
     Renders the empty jukebox page.
     """
     songs: List[Song] = []
-
+    query = ""
     if request.method == "POST":
         query = request.form["query"]
 
@@ -55,7 +55,7 @@ def jukebox() -> Any:
 
             songs = spotify.filter_songs(session["feel"], session["songs"])
 
-    return render_template("jukebox.html", songs=songs, dials=DIALS)
+    return render_template("jukebox.html", songs=songs, dials=DIALS, query=query)
 
 
 @bp.route("/filter", methods=["GET"])
