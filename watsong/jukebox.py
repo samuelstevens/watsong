@@ -3,7 +3,7 @@ This is the main controller (called blueprints in Flask) for the application.
 """
 
 import random
-from typing import Any, List, Dict, Union
+from typing import Any, Dict, List, Union
 
 from flask import (
     Blueprint,
