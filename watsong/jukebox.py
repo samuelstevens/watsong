@@ -3,7 +3,7 @@ This is the main controller (called blueprints in Flask) for the application.
 """
 
 import random
-from typing import Any, List, Dict, Union
+from typing import Any, Dict, List, Union
 
 from flask import (
     Blueprint,
@@ -29,7 +29,7 @@ def jukebox() -> Any:
     Renders the empty jukebox page.
     """
     songs: List[Song] = []
-
+    query = ""
     if request.method == "POST":
         query = request.form["query"]
 
@@ -75,7 +75,7 @@ def jukebox() -> Any:
                 flash(str(e))
                 return render_template("jukebox.html", songs=songs, dials=DIALS)
 
-    return render_template("jukebox.html", songs=songs, dials=DIALS)
+    return render_template("jukebox.html", songs=songs, dials=DIALS, query=query)
 
 
 @bp.route("/filter", methods=["GET"])
