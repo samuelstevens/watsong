@@ -126,16 +126,7 @@ function showPlaylist() {
     GLOBAL.setPlaylistId(playlistId);
   });
 }
-// Display name of query above playlist
-function displayName(){
-    const playlistTitle = $("#playlistTitle");
-    playlistTitle.empty();
-    playlistTitle.append("Your Mix: ");
-    playlistTitle.append(document.getElementById("searchbar").value);
 
-    // Add Dial values
-    //playlistTitle.append("Energy: Dance: Lyrics: Valence: Artists: ");
-}
 function subscribeToPlaylist() {
   const playlistId = GLOBAL.getPlaylistId();
 
