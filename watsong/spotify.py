@@ -2,6 +2,7 @@
 A file to communicate with the spotify API
 """
 import heapq
+import os
 import pickle
 from typing import Any, Dict, Generic, List, Optional
 
@@ -19,6 +20,7 @@ from .test.spotify_mocks import between_worlds_mock
 CLIENT_ID = "8170c7110cfb4503af349a6a8ea22fd3"
 CLIENT_SECRET = "0be6c71210bd495ab3f75e9b7f8a8935"
 USERNAME = "rp5ukikcsq2vjzakx29pxazlq"
+
 
 # region types
 
@@ -75,7 +77,6 @@ def init_app(app: flask.Flask) -> flask.Flask:
         app.spotify = between_worlds_mock()
     else:
         app.spotify = get_spotify()
-
     return app
 
 
@@ -116,21 +117,13 @@ def cache(album_descriptions: List[AlbumDescription], sp: spotipy.Spotify) -> No
     missed = [False, False, False]
     for title, artists in album_descriptions:
         q = query(title, artists)
-        try:
-            search_result = search_memo[q]
-        except KeyError:
+        if q not in search_memo:
             missed[0] = True
-            search_result = sp.search(query(title, artists), type="album", limit=50)
-            search_memo[q] = search_result
-        album_id = find_album_id_from_search(search_result, artists)
-        if album_id:
-            try:
-                album_tracks_memo[album_id] = album_tracks_memo[
-                    album_id
-                ]  # what is this?
-            except KeyError:
-                missed[1] = True
-                album_tracks_memo[album_id] = sp.album_tracks(album_id)
+            search_memo[q] = sp.search(query(title, artists), type="album", limit=50)
+        album_id = find_album_id_from_search(search_memo[q], artists)
+        if album_id is not None and album_id not in album_tracks_memo:
+            missed[1] = True
+            album_tracks_memo[album_id] = sp.album_tracks(album_id)
     if missed[0]:
         set_memo(search_memo, "search")
     if missed[1]:
@@ -154,8 +147,7 @@ def cache(album_descriptions: List[AlbumDescription], sp: spotipy.Spotify) -> No
 
 
 def find_album_id_from_search(
-    search: SpotifySearch,
-    artists: List[str],
+    search: SpotifySearch, artists: List[str]
 ) -> Optional[str]:
     results = search["albums"]["items"]
 
@@ -239,9 +231,9 @@ def add_audio_features(songs: List[Song], sp: spotipy.Spotify) -> List[Song]:
     annotated_songs = []
     feature_list = []
     for song in songs:
-        try:
+        if song["uri"] in feature_memo:
             features = feature_memo[song["uri"]]
-        except KeyError:
+        else:
             features = sp.audio_features(song["uri"])[0]
         feature_list.append(features)
 
@@ -271,7 +263,6 @@ def filter_songs(feel: Feel, songs: List[Song], n: int = 25) -> List[Song]:
         ]
         return sum([d * d for d in diff])
 
-    print("First song in filter_songs: ", heapq.nsmallest(n, songs, key=dist)[0])
     return heapq.nsmallest(n, songs, key=dist)
 
 
@@ -297,6 +288,22 @@ def create_playlist(
         if full_url
         else str(playlist["id"])
     )
+
+
+def logout() -> str:
+    """
+    Change who you are logged in as.
+    Return "" on successful change`, else return a string for the error
+    """
+    cache_file_path = os.path.join(os.getcwd(), ".cache")
+    try:
+        os.remove(cache_file_path)
+    except FileNotFoundError:
+        pass
+    # Make the login prompt appear by calling an api function
+    sp = get_spotify()
+    sp.current_user()
+    return "You are now logged out."
 
 
 def get_album_features(ids: List[str]) -> Dict[str, float]:
@@ -474,7 +481,7 @@ if __name__ == "__main__":
     album_list = [
         AlbumDescription("A girl between worlds", []),
     ]
-    sp = get_spotify
+    sp = get_spotify()
     album_songs = get_songs(album_list, sp)
     add_audio_features(album_songs, sp)
     x = create_playlist(album_songs, sp, full_url=False)

@@ -14,8 +14,10 @@ docutils==0.16
 flake8==3.8.4
 Flask==1.1.2
 Flask-Session==0.3.2
-ibm-cloud-sdk-core==3.3.0
-ibm-watson==4.7.1
+ibm-watson~=4.7.1
+# Using the most recent version of the ibm cloud sdk core service conflicts with ibm watson version 4.7.1
+# Run pip install -r requirements.txt --use-feature=2020-resolver to see the error
+ibm-cloud-sdk-core~=1.7.3
 idna==2.10
 imagesize==1.2.0
 importlib-metadata==2.0.0
@@ -44,7 +46,6 @@ pytz==2020.1
 regex==2020.10.15
 requests==2.24.0
 rstcheck==3.3.1
-scipy==1.5.3
 six==1.15.0
 snowballstemmer==2.0.0
 Sphinx==3.2.1

@@ -3,7 +3,7 @@ This is the main controller (called blueprints in Flask) for the application.
 """
 
 import random
-from typing import Any, List
+from typing import Any, List, Dict, Union
 
 from flask import (
     Blueprint,
@@ -20,7 +20,7 @@ from .structures import Feel, Song, assert_feel, default_feel
 
 bp = Blueprint("jukebox", __name__, url_prefix="/jukebox")
 
-DIALS = ["dance", "lyrics", "energy", "valence"]
+DIALS = ["dance", "lyrics", "energy", "happiness"]
 
 
 @bp.route("/", methods=["GET", "POST"])
@@ -35,25 +35,45 @@ def jukebox() -> Any:
 
         if query:
             album_descs, err = watson.get_albums(query)
+            if len(album_descs) == 0:
+                flash(
+                    "Your query was not descriptive enough to match to a song well. Try adding more descriptive words."
+                )
+                return render_template("jukebox.html", songs=songs, dials=DIALS)
 
             if err is not None:
                 flash(str(err))
                 return render_template("jukebox.html", songs=songs, dials=DIALS)
 
+            if not album_descs:
+                flash("Invalid input")
+                return render_template("jukebox.html", songs=songs, dials=DIALS)
+
             if not current_app.testing:
                 spotify.cache(album_descs, current_app.spotify)
-
-            songs = spotify.get_songs(album_descs, current_app.spotify)
+            try:
+                songs = spotify.get_songs(album_descs, current_app.spotify)
+            except Exception as e:
+                flash(str(e))
+                return render_template("jukebox.html", songs=songs, dials=DIALS)
 
             random.shuffle(songs)
-            songs = spotify.add_audio_features(songs, current_app.spotify)
+            try:
+                songs = spotify.add_audio_features(songs, current_app.spotify)
+            except Exception as e:
+                flash(str(e))
+                return render_template("jukebox.html", songs=songs, dials=DIALS)
 
             session["songs"] = songs
 
             if "feel" not in session:
                 session["feel"] = default_feel()
 
-            songs = spotify.filter_songs(session["feel"], session["songs"])
+            try:
+                songs = spotify.filter_songs(session["feel"], session["songs"])
+            except Exception as e:
+                flash(str(e))
+                return render_template("jukebox.html", songs=songs, dials=DIALS)
 
     return render_template("jukebox.html", songs=songs, dials=DIALS, query=query)
 
@@ -64,10 +84,10 @@ def filter() -> Any:
     Take a request and its songs and filter them according to DIALS
     """
     feel = Feel(
-        valence=request.args.get("valence", 1.0, type=float),
-        lyrics=request.args.get("lyrics", 1.0, type=float),
-        dance=request.args.get("dance", 1.0, type=float),
-        energy=request.args.get("energy", 1.0, type=float),
+        valence=request.args.get("valence", 0.5, type=float),
+        lyrics=request.args.get("lyrics", 0.5, type=float),
+        dance=request.args.get("dance", 0.5, type=float),
+        energy=request.args.get("energy", 0.5, type=float),
     )
 
     session["feel"] = feel
@@ -84,8 +104,6 @@ def showPlaylist() -> Any:
     """
     Show embedded spotify playlist
     """
-    """url = spotify.create_playlist(session["songs"])"""
-
     songs = spotify.filter_songs(session["feel"], session["songs"])
 
     url = spotify.create_playlist(songs, current_app.spotify, full_url=False)
@@ -94,9 +112,8 @@ def showPlaylist() -> Any:
 
 @bp.route("/subscribe", methods=["GET"])
 def subscribe() -> Any:
+    result = {"msg": ""}
     try:
-        result = {"msg": ""}
-
         playlist_id = request.args.get("playlistId", type=str)
         if not playlist_id:
             result["msg"] = "No playlist id provided."
@@ -107,3 +124,17 @@ def subscribe() -> Any:
     except Exception as e:
         result["msg"] = str(e)
         return jsonify(result)
+
+
+@bp.route("/logout", methods=["GET"])
+def logout() -> Any:
+    result: Dict[str, Union[str, bool]] = {}
+    try:
+        result_str = spotify.logout()
+        result["success"] = result_str == ""
+        if not result["success"]:
+            result["msg"] = result_str
+    except Exception as e:
+        result["success"] = False
+        result["msg"] = str(e)
+    return jsonify(result)
