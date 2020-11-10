@@ -32,7 +32,7 @@ def jukebox() -> Any:
     query = ""
     if request.method == "POST":
         query = request.form["query"]
-
+        session["query"] = query
         if query:
             album_descs, err = watson.get_albums(query)
 
@@ -88,7 +88,7 @@ def showPlaylist() -> Any:
 
     songs = spotify.filter_songs(session["feel"], session["songs"])
 
-    url = spotify.create_playlist(songs, current_app.spotify, full_url=False)
+    url = spotify.create_playlist(songs, current_app.spotify,  session["query"], full_url=False)
     return jsonify(url)
 
 

@@ -278,12 +278,13 @@ def filter_songs(feel: Feel, songs: List[Song], n: int = 25) -> List[Song]:
 def create_playlist(
     songs: List[Song],
     sp: spotipy.Spotify,
+    title: str,
     full_url: bool = True,
 ) -> str:
     # Find the watsong playlist and use it if possible
     playlist = sp.user_playlist_create(
         sp.current_user()["id"],
-        "Watsong Playlist",
+        title,
         public=False,
         collaborative=True,
         description="A playlist created by watsong just for you",
