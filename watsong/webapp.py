@@ -43,6 +43,9 @@ def create_app(test_config: Optional[Any] = None) -> Flask:
     )
 
     SESSION.init_app(app)
-    app.get_spotify = between_worlds_mock if app.testing else spotify.get_spotify
+
+    @app.before_first_request
+    def before_first_request() -> None:
+        app.spotify = between_worlds_mock() if app.testing else spotify.get_spotify()
 
     return app
