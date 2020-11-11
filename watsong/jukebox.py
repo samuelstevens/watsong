@@ -84,7 +84,7 @@ def filter() -> Any:
     Take a request and its songs and filter them according to DIALS
     """
     feel = Feel(
-        valence=request.args.get("valence", 0.5, type=float),
+        valence=request.args.get("happiness", 0.5, type=float),
         lyrics=request.args.get("lyrics", 0.5, type=float),
         dance=request.args.get("dance", 0.5, type=float),
         energy=request.args.get("energy", 0.5, type=float),
