@@ -3,7 +3,8 @@ This is the main controller (called blueprints in Flask) for the application.
 """
 
 import random
-from typing import Any, Dict, List, Union
+from typing import Any, List
+from typing_extensions import TypedDict
 
 from flask import (
     Blueprint,
@@ -35,22 +36,19 @@ def jukebox() -> Any:
 
         if query:
             album_descs, err = watson.get_albums(query)
+            if err is not None:
+                flash(str(err))
+                return render_template("jukebox.html", songs=songs, dials=DIALS)
+
             if len(album_descs) == 0:
                 flash(
                     "Your query was not descriptive enough to match to a song well. Try adding more descriptive words."
                 )
                 return render_template("jukebox.html", songs=songs, dials=DIALS)
 
-            if err is not None:
-                flash(str(err))
-                return render_template("jukebox.html", songs=songs, dials=DIALS)
-
-            if not album_descs:
-                flash("Invalid input")
-                return render_template("jukebox.html", songs=songs, dials=DIALS)
-
             if not current_app.testing:
                 spotify.cache(album_descs, current_app.spotify)
+
             try:
                 songs = spotify.get_songs(album_descs, current_app.spotify)
             except Exception as e:
@@ -126,15 +124,19 @@ def subscribe() -> Any:
         return jsonify(result)
 
 
-@bp.route("/logout", methods=["GET"])
-def logout() -> Any:
-    result: Dict[str, Union[str, bool]] = {}
-    try:
-        result_str = spotify.logout()
-        result["success"] = result_str == ""
-        if not result["success"]:
-            result["msg"] = result_str
-    except Exception as e:
+class Result(TypedDict):
+    success: bool
+    msg: str
+
+
+@bp.route("/login", methods=["GET"])
+def login() -> Any:
+    result: Result = {"success": True, "msg": ""}
+
+    logged_in = spotify.login(current_app.spotify)
+
+    if isinstance(logged_in, Exception):
         result["success"] = False
-        result["msg"] = str(e)
+        result["msg"] = str(logged_in)
+
     return jsonify(result)

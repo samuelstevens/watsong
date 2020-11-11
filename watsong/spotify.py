@@ -17,10 +17,9 @@ from .test.spotify_mocks import between_worlds_mock
 
 # These are also stored in the environment but it's easier to leave them here
 # since it causes some problems in how I run it if I use the environment variables
-CLIENT_ID = "8170c7110cfb4503af349a6a8ea22fd3"
-CLIENT_SECRET = "0be6c71210bd495ab3f75e9b7f8a8935"
-USERNAME = "rp5ukikcsq2vjzakx29pxazlq"
-
+CLIENT_ID = os.environ["SPOTIPY_CLIENT_ID"]
+CLIENT_SECRET = os.environ["SPOTIPY_CLIENT_SECRET"]
+CACHE_PATH = os.path.join(os.getcwd(), ".cache")
 
 # region types
 
@@ -61,15 +60,25 @@ class SpotifySearch(TypedDict):
 
 
 def get_spotify() -> spotipy.Spotify:
-    return spotipy.Spotify(
+    """
+    Creates a spotify client, which will not be logged in until necessary.
+
+    When it's necessary to log in (show playlist), it will open a browser window and wait for the response.
+
+    Sometimes we never get a response
+    """
+    sp = spotipy.Spotify(
         oauth_manager=SpotifyOAuth(
             client_id=CLIENT_ID,
             client_secret=CLIENT_SECRET,
+            cache_path=CACHE_PATH,
             redirect_uri="http://localhost:7233/callback",
             scope="playlist-modify-public playlist-modify-private",
             show_dialog=True,
         )
     )
+
+    return sp
 
 
 def init_app(app: flask.Flask) -> flask.Flask:
@@ -290,20 +299,21 @@ def create_playlist(
     )
 
 
-def logout() -> str:
+def login(sp: spotipy.Spotify) -> Optional[Exception]:
     """
     Change who you are logged in as.
-    Return "" on successful change`, else return a string for the error
     """
-    cache_file_path = os.path.join(os.getcwd(), ".cache")
+
+    # removes cached account information
     try:
-        os.remove(cache_file_path)
+        os.remove(CACHE_PATH)
     except FileNotFoundError:
         pass
+
     # Make the login prompt appear by calling an api function
-    sp = get_spotify()
     sp.current_user()
-    return "You are now logged out."
+
+    return None
 
 
 def get_album_features(ids: List[str]) -> Dict[str, float]:

@@ -5,8 +5,8 @@
  * @return {{x: number, y: number}} center of elem in as object with .x and .y
  */
 function getCenter(elem) {
-    const {top, left, width} = elem.getBoundingClientRect();
-    return {y: top + width / 2, x: left + width / 2};
+    const { top, left, width } = elem.getBoundingClientRect();
+    return { y: top + width / 2, x: left + width / 2 };
 }
 
 /**
@@ -17,11 +17,11 @@ function getCenter(elem) {
  */
 function getCoord(event) {
     if (event instanceof MouseEvent) {
-        return {x: event.clientX, y: event.clientY};
+        return { x: event.clientX, y: event.clientY };
     } else {
         // return coordinates of first touch
         const firstTouch = event.touches[0];
-        return {x: firstTouch.clientX, y: firstTouch.clientY};
+        return { x: firstTouch.clientX, y: firstTouch.clientY };
     }
 }
 
@@ -47,7 +47,7 @@ function initializeDial(elem, dialName) {
         event.preventDefault();
 
         center = getCenter(elem);
-        const {x, y} = getCoord(event);
+        const { x, y } = getCoord(event);
 
         initialAngle = Math.atan2(x - center.x, y - center.y);
 
@@ -66,7 +66,7 @@ function initializeDial(elem, dialName) {
     function onTwist(event) {
         event.preventDefault();
 
-        const {x, y} = getCoord(event);
+        const { x, y } = getCoord(event);
 
         const newAngle = Math.atan2(x - center.x, y - center.y);
 
@@ -110,7 +110,7 @@ function setSongs(songs) {
     });
 }
 
-const LOGIN_ALERT = "You are currently logging into spotify in another tab. Please finish that operation before using this function."
+const LOGIN_ALERT = "You are currently logging into spotify in another tab. Please finish that operation before using this function.";
 
 function showPlaylist() {
     const playlistId = GLOBAL.getPlaylistId();
@@ -130,7 +130,7 @@ function showPlaylist() {
             GLOBAL.setPlaylistId(playlistId);
         });
     } else {
-        alert(LOGIN_ALERT)
+        alert(LOGIN_ALERT);
     }
 }
 
@@ -138,30 +138,30 @@ function subscribeToPlaylist() {
     const playlistId = GLOBAL.getPlaylistId();
     if (!GLOBAL.loggingIn()) {
         GLOBAL.setLoggingIn(true);
-        $.getJSON($SCRIPT_ROOT + '/jukebox/subscribe', {playlistId}, ({msg}) => {
-            GLOBAL.setLoggingIn(false)
+        $.getJSON($SCRIPT_ROOT + '/jukebox/subscribe', { playlistId }, ({ msg }) => {
+            GLOBAL.setLoggingIn(false);
             alert(msg);
         });
     } else {
-        alert(LOGIN_ALERT)
+        alert(LOGIN_ALERT);
     }
 }
 
-function logout() {
+function login() {
     // Sometimes things break and the user closes the login tab before the spotify operation finishes,
     // or when the internet is too slow. I think spotify might be mad at my account for overtesting it
     // with too many logins though...
     if (!GLOBAL.loggingIn()) {
-        GLOBAL.setLoggingIn(true)
+        GLOBAL.setLoggingIn(true);
     } else {
-        alert(LOGIN_ALERT)
+        alert(LOGIN_ALERT);
     }
-    $.getJSON($SCRIPT_ROOT + '/jukebox/logout', {}, ({success, msg}) => {
-        GLOBAL.setLoggingIn(false)
+    $.getJSON($SCRIPT_ROOT + '/jukebox/login', {}, ({ success, msg }) => {
+        GLOBAL.setLoggingIn(false);
         if (!success) {
             alert(msg);
         }
-    })
+    });
 }
 
 /**
@@ -182,7 +182,7 @@ const StateModule = () => {
 
     /** A boolean parameter for if you are currently logging into spotify.
      * Helps ensure that multiple requests don't occur at the same time */
-    let isLoggingIn = false
+    let isLoggingIn = false;
 
     /**
      *
@@ -190,9 +190,9 @@ const StateModule = () => {
      */
     const setLoggingIn = (newVal) => {
         isLoggingIn = newVal;
-    }
+    };
 
-    const loggingIn = () => isLoggingIn
+    const loggingIn = () => isLoggingIn;
 
     /**
      * setFeel sets a field in `feel`
@@ -208,8 +208,8 @@ const StateModule = () => {
         if (!skipRequest) {
             $.getJSON($SCRIPT_ROOT + '/jukebox/filter', feel, setSongs);
             const select = $("#" + field + "_value");
-            console.log(select)
-            select[0].innerText = Math.round(100*value) + '%'
+            console.log(select);
+            select[0].innerText = Math.round(100 * value) + '%';
         }
     };
 
