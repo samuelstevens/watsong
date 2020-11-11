@@ -45,5 +45,4 @@ def get_albums(query: str) -> Result[List[AlbumDescription]]:
             albums.append(album_desc)
     except Exception as e:
         error = e
-
     return albums, error

@@ -58,7 +58,7 @@ def test_create_playlist() -> None:
     ]
     mock = between_worlds_mock()
     songs = get_songs(album_list, sp=mock)
-    link1 = create_playlist(songs, sp=mock)
+    link1 = create_playlist(songs, sp=mock, full_url=True)
     mock.playlist_add_items.assert_called()
     assert re.match("https://open.spotify.com/embed/playlist/*", link1)
 

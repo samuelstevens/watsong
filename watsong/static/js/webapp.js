@@ -1,5 +1,3 @@
-// @ts-check
-
 /**
  * getCenter returns the center of an HTML element in x-y coordinates.
  *

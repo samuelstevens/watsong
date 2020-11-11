@@ -21,6 +21,7 @@ CLIENT_ID = os.environ["SPOTIPY_CLIENT_ID"]
 CLIENT_SECRET = os.environ["SPOTIPY_CLIENT_SECRET"]
 CACHE_PATH = os.path.join(os.getcwd(), ".cache")
 
+
 # region types
 
 
