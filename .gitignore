@@ -25,7 +25,6 @@ build/
 .mypy_cache/
 watsong/.cache*
 .cache*
-.usercache
 
 # IDE-related, add as necessary
 .vscode/

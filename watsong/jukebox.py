@@ -39,19 +39,18 @@ def jukebox() -> Any:
 
         if query:
             album_descs, err = watson.get_albums(query)
-            if err is not None:
-                flash(str(err))
-                return render_template("jukebox.html", songs=songs, dials=DIALS)
-
             if len(album_descs) == 0:
                 flash(
                     "Your query was not descriptive enough to match to a song well. Try adding more descriptive words."
                 )
                 return render_template("jukebox.html", songs=songs, dials=DIALS)
 
+            if err is not None:
+                flash(str(err))
+                return render_template("jukebox.html", songs=songs, dials=DIALS)
+
             if not current_app.testing:
                 spotify.cache(album_descs, current_app.spotify)
-
             try:
                 songs = spotify.get_songs(album_descs, current_app.spotify)
             except Exception as e:
@@ -103,7 +102,7 @@ def filter() -> Any:
 @bp.route("/showPlaylist", methods=["GET"])
 def showPlaylist() -> Any:
     """
-    Show embedded spotify playlist.
+    Show embedded spotify playlist
     """
 
     result = {"success": True, "msg": ""}
