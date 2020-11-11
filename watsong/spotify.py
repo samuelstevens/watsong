@@ -6,14 +6,12 @@ import os
 import pickle
 from typing import Any, Dict, Generic, List, Optional
 
-import flask
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 from typing_extensions import TypedDict
 
 from . import util
 from .structures import Album, AlbumDescription, Feel, Song
-from .test.spotify_mocks import between_worlds_mock
 
 # These are also stored in the environment but it's easier to leave them here
 # since it causes some problems in how I run it if I use the environment variables
@@ -79,14 +77,6 @@ def get_spotify() -> spotipy.Spotify:
     sp.current_user()
 
     return sp
-
-
-def init_app(app: flask.Flask) -> flask.Flask:
-    if app.testing:
-        app.spotify = between_worlds_mock()
-    else:
-        app.spotify = get_spotify()
-    return app
 
 
 def query(title: str, artists: List[str]) -> str:

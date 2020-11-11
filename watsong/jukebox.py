@@ -29,8 +29,9 @@ def jukebox() -> Any:
     Renders the empty jukebox page.
     """
 
-    if "user-spotify" not in session and not current_app.testing:
-        session["user-spotify"] = spotify.get_spotify()
+    if "user-spotify" not in session:
+        session["user-spotify"] = True
+        current_app.spotify = current_app.get_spotify()
 
     songs: List[Song] = []
     query = ""
@@ -111,7 +112,7 @@ def showPlaylist() -> Any:
 
     try:
         result["playlistId"] = spotify.create_playlist(
-            songs, session["user-spotify"], full_url=False
+            songs, current_app.spotify, full_url=False
         )
     except Exception as err:
         result["success"] = False
@@ -128,7 +129,7 @@ def subscribe() -> Any:
         if not playlist_id:
             result["msg"] = "No playlist id provided."
             return jsonify(result)
-        spotify.subscribe_to_playlist(playlist_id, session["user-spotify"])
+        spotify.subscribe_to_playlist(playlist_id, current_app.spotify)
         result["msg"] = "Subscribed to playlist!"
         return jsonify(result)
     except Exception as e:
