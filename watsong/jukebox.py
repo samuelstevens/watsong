@@ -3,7 +3,7 @@ This is the main controller (called blueprints in Flask) for the application.
 """
 
 import random
-from typing import Any, Dict, List, Union
+from typing import Any, List
 
 from flask import (
     Blueprint,
@@ -28,6 +28,11 @@ def jukebox() -> Any:
     """
     Renders the empty jukebox page.
     """
+
+    if "user-spotify" not in session:
+        session["user-spotify"] = True
+        current_app.spotify = current_app.get_spotify()
+
     songs: List[Song] = []
     query = ""
     if request.method == "POST":
@@ -43,10 +48,6 @@ def jukebox() -> Any:
 
             if err is not None:
                 flash(str(err))
-                return render_template("jukebox.html", songs=songs, dials=DIALS)
-
-            if not album_descs:
-                flash("Invalid input")
                 return render_template("jukebox.html", songs=songs, dials=DIALS)
 
             if not current_app.testing:
@@ -104,10 +105,20 @@ def showPlaylist() -> Any:
     """
     Show embedded spotify playlist
     """
+
+    result = {"success": True, "msg": ""}
+
     songs = spotify.filter_songs(session["feel"], session["songs"])
 
-    url = spotify.create_playlist(songs, current_app.spotify, full_url=False)
-    return jsonify(url)
+    try:
+        result["playlistId"] = spotify.create_playlist(
+            songs, current_app.spotify, full_url=False
+        )
+    except Exception as err:
+        result["success"] = False
+        result["msg"] = str(err)
+
+    return jsonify(result)
 
 
 @bp.route("/subscribe", methods=["GET"])
@@ -124,17 +135,3 @@ def subscribe() -> Any:
     except Exception as e:
         result["msg"] = str(e)
         return jsonify(result)
-
-
-@bp.route("/logout", methods=["GET"])
-def logout() -> Any:
-    result: Dict[str, Union[str, bool]] = {}
-    try:
-        result_str = spotify.logout()
-        result["success"] = result_str == ""
-        if not result["success"]:
-            result["msg"] = result_str
-    except Exception as e:
-        result["success"] = False
-        result["msg"] = str(e)
-    return jsonify(result)

@@ -6,6 +6,7 @@ from flask import Flask, redirect, url_for
 from flask_session import Session
 
 from . import jukebox, spotify
+from .test.spotify_mocks import between_worlds_mock
 
 SESSION = Session()
 
@@ -42,6 +43,6 @@ def create_app(test_config: Optional[Any] = None) -> Flask:
     )
 
     SESSION.init_app(app)
-    spotify.init_app(app)  # adds client to app
+    app.get_spotify = between_worlds_mock if app.testing else spotify.get_spotify
 
     return app

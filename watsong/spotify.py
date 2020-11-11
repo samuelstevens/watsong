@@ -6,20 +6,18 @@ import os
 import pickle
 from typing import Any, Dict, Generic, List, Optional
 
-import flask
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 from typing_extensions import TypedDict
 
 from . import util
 from .structures import Album, AlbumDescription, Feel, Song
-from .test.spotify_mocks import between_worlds_mock
 
 # These are also stored in the environment but it's easier to leave them here
 # since it causes some problems in how I run it if I use the environment variables
-CLIENT_ID = "8170c7110cfb4503af349a6a8ea22fd3"
-CLIENT_SECRET = "0be6c71210bd495ab3f75e9b7f8a8935"
-USERNAME = "rp5ukikcsq2vjzakx29pxazlq"
+CLIENT_ID = os.environ["SPOTIPY_CLIENT_ID"]
+CLIENT_SECRET = os.environ["SPOTIPY_CLIENT_SECRET"]
+CACHE_PATH = os.path.join(os.getcwd(), ".cache")
 
 
 # region types
@@ -61,23 +59,24 @@ class SpotifySearch(TypedDict):
 
 
 def get_spotify() -> spotipy.Spotify:
-    return spotipy.Spotify(
+    """
+    Creates a user's spotify client, which will be immediately logged in.
+    """
+    sp = spotipy.Spotify(
         oauth_manager=SpotifyOAuth(
             client_id=CLIENT_ID,
             client_secret=CLIENT_SECRET,
+            cache_path=CACHE_PATH,
             redirect_uri="http://localhost:7233/callback",
             scope="playlist-modify-public playlist-modify-private",
             show_dialog=True,
         )
     )
 
+    # trigger login page
+    sp.current_user()
 
-def init_app(app: flask.Flask) -> flask.Flask:
-    if app.testing:
-        app.spotify = between_worlds_mock()
-    else:
-        app.spotify = get_spotify()
-    return app
+    return sp
 
 
 def query(title: str, artists: List[str]) -> str:
@@ -266,11 +265,7 @@ def filter_songs(feel: Feel, songs: List[Song], n: int = 25) -> List[Song]:
     return heapq.nsmallest(n, songs, key=dist)
 
 
-def create_playlist(
-    songs: List[Song],
-    sp: spotipy.Spotify,
-    full_url: bool = True,
-) -> str:
+def create_playlist(songs: List[Song], sp: spotipy.Spotify, full_url: bool) -> str:
     # Find the watsong playlist and use it if possible
     playlist = sp.user_playlist_create(
         sp.current_user()["id"],
@@ -288,22 +283,6 @@ def create_playlist(
         if full_url
         else str(playlist["id"])
     )
-
-
-def logout() -> str:
-    """
-    Change who you are logged in as.
-    Return "" on successful change`, else return a string for the error
-    """
-    cache_file_path = os.path.join(os.getcwd(), ".cache")
-    try:
-        os.remove(cache_file_path)
-    except FileNotFoundError:
-        pass
-    # Make the login prompt appear by calling an api function
-    sp = get_spotify()
-    sp.current_user()
-    return "You are now logged out."
 
 
 def get_album_features(ids: List[str]) -> Dict[str, float]:

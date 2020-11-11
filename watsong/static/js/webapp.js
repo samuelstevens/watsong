@@ -5,8 +5,8 @@
  * @return {{x: number, y: number}} center of elem in as object with .x and .y
  */
 function getCenter(elem) {
-    const {top, left, width} = elem.getBoundingClientRect();
-    return {y: top + width / 2, x: left + width / 2};
+    const { top, left, width } = elem.getBoundingClientRect();
+    return { y: top + width / 2, x: left + width / 2 };
 }
 
 /**
@@ -17,11 +17,11 @@ function getCenter(elem) {
  */
 function getCoord(event) {
     if (event instanceof MouseEvent) {
-        return {x: event.clientX, y: event.clientY};
+        return { x: event.clientX, y: event.clientY };
     } else {
         // return coordinates of first touch
         const firstTouch = event.touches[0];
-        return {x: firstTouch.clientX, y: firstTouch.clientY};
+        return { x: firstTouch.clientX, y: firstTouch.clientY };
     }
 }
 
@@ -47,7 +47,7 @@ function initializeDial(elem, dialName) {
         event.preventDefault();
 
         center = getCenter(elem);
-        const {x, y} = getCoord(event);
+        const { x, y } = getCoord(event);
 
         initialAngle = Math.atan2(x - center.x, y - center.y);
 
@@ -66,7 +66,7 @@ function initializeDial(elem, dialName) {
     function onTwist(event) {
         event.preventDefault();
 
-        const {x, y} = getCoord(event);
+        const { x, y } = getCoord(event);
 
         const newAngle = Math.atan2(x - center.x, y - center.y);
 
@@ -110,59 +110,37 @@ function setSongs(songs) {
     });
 }
 
-const LOGIN_ALERT = "You are currently logging into spotify in another tab. Please finish that operation before using this function."
 
 function showPlaylist() {
-    const playlistId = GLOBAL.getPlaylistId();
-    if (!GLOBAL.loggingIn()) {
-        GLOBAL.setLoggingIn(true);
-        $.getJSON($SCRIPT_ROOT + '/jukebox/showPlaylist', {}, function (playlistId) {
-            GLOBAL.setLoggingIn(false);
-            const url = 'https://open.spotify.com/embed/playlist/' + playlistId;
-            const playlist = $("#playlist");
-            playlist.empty();
-            playlist.append(`<iframe src="${url}" width="100%" height="380" frameborder="0" allowtransparency="true" allow="encrypted-media" id="spotify"></iframe>`);
-            const button = $("#subscribe-button");
-            if (button.length === 0) {
-                $("#jukebox-form").append(`<button type="button" id="subscribe-button" class="chunky-button" onclick="subscribeToPlaylist()">Subscribe</button>`);
-            }
 
-            GLOBAL.setPlaylistId(playlistId);
-        });
-    } else {
-        alert(LOGIN_ALERT)
-    }
+    $.getJSON($SCRIPT_ROOT + '/jukebox/showPlaylist', {}, function ({ playlistId, success, msg }) {
+        if (!success) {
+            alert(msg);
+            return;
+        }
+
+        const url = `https://open.spotify.com/embed/playlist/${playlistId}`;
+
+        const playlist = $("#playlist");
+        playlist.empty();
+        playlist.append(`<iframe src="${url}" width="100%" height="380" frameborder="0" allowtransparency="true" allow="encrypted-media" id="spotify"></iframe>`);
+
+        const button = $("#subscribe-button");
+        if (button.length === 0) {
+            $("#jukebox-form").append(`<button type="button" id="subscribe-button" class="chunky-button" onclick="subscribeToPlaylist()">Subscribe</button>`);
+        }
+
+        GLOBAL.setPlaylistId(playlistId);
+    });
+
 }
 
 function subscribeToPlaylist() {
-    const playlistId = GLOBAL.getPlaylistId();
-    if (!GLOBAL.loggingIn()) {
-        GLOBAL.setLoggingIn(true);
-        $.getJSON($SCRIPT_ROOT + '/jukebox/subscribe', {playlistId}, ({msg}) => {
-            GLOBAL.setLoggingIn(false)
-            alert(msg);
-        });
-    } else {
-        alert(LOGIN_ALERT)
-    }
+    $.getJSON($SCRIPT_ROOT + '/jukebox/subscribe', { playlistId: GLOBAL.getPlaylistId() }, ({ msg }) => {
+        alert(msg);
+    });
 }
 
-function logout() {
-    // Sometimes things break and the user closes the login tab before the spotify operation finishes,
-    // or when the internet is too slow. I think spotify might be mad at my account for overtesting it
-    // with too many logins though...
-    if (!GLOBAL.loggingIn()) {
-        GLOBAL.setLoggingIn(true)
-    } else {
-        alert(LOGIN_ALERT)
-    }
-    $.getJSON($SCRIPT_ROOT + '/jukebox/logout', {}, ({success, msg}) => {
-        GLOBAL.setLoggingIn(false)
-        if (!success) {
-            alert(msg);
-        }
-    })
-}
 
 /**
  * songRawHTML returns a raw HTML string representing the song element.
@@ -176,23 +154,20 @@ function songRawHTML(song) {
 
 // MAIN
 
+/**
+ *
+ *
+ * @return {{
+ *  setFeel: (field: string, value: number, skipRequest?: boolean) => void, 
+ *  getFeel: () => { [field: string] : number; }, 
+ *  getPlaylistId: () => string, 
+ *  setPlaylistId: (id: string) => void
+ * }} 
+ */
 const StateModule = () => {
+    /** @type {{ [field: string] : number; }} */
     let feel = {};
     let playlistId = null;
-
-    /** A boolean parameter for if you are currently logging into spotify.
-     * Helps ensure that multiple requests don't occur at the same time */
-    let isLoggingIn = false
-
-    /**
-     *
-     * @param newVal if the user is logging in
-     */
-    const setLoggingIn = (newVal) => {
-        isLoggingIn = newVal;
-    }
-
-    const loggingIn = () => isLoggingIn
 
     /**
      * setFeel sets a field in `feel`
@@ -204,21 +179,20 @@ const StateModule = () => {
     const setFeel = (field, value, skipRequest = false) => {
         feel[field] = value;
 
-
         if (!skipRequest) {
             $.getJSON($SCRIPT_ROOT + '/jukebox/filter', feel, setSongs);
             const select = $("#" + field + "_value");
-            console.log(select)
-            select[0].innerText = Math.round(100*value) + '%'
+            select[0].innerText = Math.round(100 * value) + '%';
         }
     };
 
     /**
      * getFeel returns a copy of the feel object
      *
-     * @return {*}
+     * @return {{ [field: string] : number; }}
      */
     const getFeel = () => {
+        /** @type {{ [field: string] : number; }} */
         const feelClone = {};
         for (const field in feel) {
             feelClone[field] = feel[field];
@@ -243,9 +217,7 @@ const StateModule = () => {
         playlistId = newId;
     };
 
-    return {
-        setFeel, getFeel, getPlaylistId, setPlaylistId, setLoggingIn, loggingIn
-    };
+    return { setFeel, getFeel, getPlaylistId, setPlaylistId };
 };
 
 const GLOBAL = StateModule();
