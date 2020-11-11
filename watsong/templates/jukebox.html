@@ -22,7 +22,8 @@
         </form>
     </div>
     <div class="gap"></div>
-    <h2>Your Mix</h2>
+    <h2 id="playlistTitle">Your Mix: {{query}}
+    </h2>
     <div id="playlist">
         {% if songs|length > 0 %}
         {% for song in songs %}
