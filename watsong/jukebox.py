@@ -29,10 +29,9 @@ def jukebox() -> Any:
     Renders the empty jukebox page.
     """
 
-    if "user-spotify" not in session:
-        session["user-spotify"] = True
-        current_app.spotify = current_app.get_spotify()
+    current_app.spotify = current_app.get_spotify()
 
+    session["songs"] = []
     songs: List[Song] = []
     query = ""
     if request.method == "POST":
