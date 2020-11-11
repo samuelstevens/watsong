@@ -4,7 +4,6 @@ This is the main controller (called blueprints in Flask) for the application.
 
 import random
 from typing import Any, List
-from typing_extensions import TypedDict
 
 from flask import (
     Blueprint,
@@ -29,6 +28,10 @@ def jukebox() -> Any:
     """
     Renders the empty jukebox page.
     """
+
+    if "user-spotify" not in session:
+        session["user-spotify"] = spotify.get_user_spotify()
+
     songs: List[Song] = []
     query = ""
     if request.method == "POST":
@@ -100,12 +103,22 @@ def filter() -> Any:
 @bp.route("/showPlaylist", methods=["GET"])
 def showPlaylist() -> Any:
     """
-    Show embedded spotify playlist
+    Show embedded spotify playlist.
     """
+
+    result = {"success": True, "msg": ""}
+
     songs = spotify.filter_songs(session["feel"], session["songs"])
 
-    url = spotify.create_playlist(songs, current_app.spotify, full_url=False)
-    return jsonify(url)
+    try:
+        result["playlistId"] = spotify.create_playlist(
+            songs, session["user-spotify"], full_url=False
+        )
+    except Exception as err:
+        result["success"] = False
+        result["msg"] = str(err)
+
+    return jsonify(result)
 
 
 @bp.route("/subscribe", methods=["GET"])
@@ -116,27 +129,9 @@ def subscribe() -> Any:
         if not playlist_id:
             result["msg"] = "No playlist id provided."
             return jsonify(result)
-        spotify.subscribe_to_playlist(playlist_id, current_app.spotify)
+        spotify.subscribe_to_playlist(playlist_id, session["user-spotify"])
         result["msg"] = "Subscribed to playlist!"
         return jsonify(result)
     except Exception as e:
         result["msg"] = str(e)
         return jsonify(result)
-
-
-class Result(TypedDict):
-    success: bool
-    msg: str
-
-
-@bp.route("/login", methods=["GET"])
-def login() -> Any:
-    result: Result = {"success": True, "msg": ""}
-
-    logged_in = spotify.login(current_app.spotify)
-
-    if isinstance(logged_in, Exception):
-        result["success"] = False
-        result["msg"] = str(logged_in)
-
-    return jsonify(result)
