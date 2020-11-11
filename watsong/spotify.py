@@ -61,11 +61,7 @@ class SpotifySearch(TypedDict):
 
 def get_spotify() -> spotipy.Spotify:
     """
-    Creates a spotify client, which will not be logged in until necessary.
-
-    When it's necessary to log in (show playlist), it will open a browser window and wait for the response.
-
-    Sometimes we never get a response
+    Creates a user's spotify client, which will be immediately logged in.
     """
     sp = spotipy.Spotify(
         oauth_manager=SpotifyOAuth(
@@ -77,6 +73,9 @@ def get_spotify() -> spotipy.Spotify:
             show_dialog=True,
         )
     )
+
+    # trigger login page
+    sp.current_user()
 
     return sp
 
@@ -275,11 +274,7 @@ def filter_songs(feel: Feel, songs: List[Song], n: int = 25) -> List[Song]:
     return heapq.nsmallest(n, songs, key=dist)
 
 
-def create_playlist(
-    songs: List[Song],
-    sp: spotipy.Spotify,
-    full_url: bool = True,
-) -> str:
+def create_playlist(songs: List[Song], sp: spotipy.Spotify, full_url: bool) -> str:
     # Find the watsong playlist and use it if possible
     playlist = sp.user_playlist_create(
         sp.current_user()["id"],
@@ -297,23 +292,6 @@ def create_playlist(
         if full_url
         else str(playlist["id"])
     )
-
-
-def login(sp: spotipy.Spotify) -> Optional[Exception]:
-    """
-    Change who you are logged in as.
-    """
-
-    # removes cached account information
-    try:
-        os.remove(CACHE_PATH)
-    except FileNotFoundError:
-        pass
-
-    # Make the login prompt appear by calling an api function
-    sp.current_user()
-
-    return None
 
 
 def get_album_features(ids: List[str]) -> Dict[str, float]:
