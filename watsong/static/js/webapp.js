@@ -115,7 +115,8 @@ function showPlaylist() {
 
     $.getJSON($SCRIPT_ROOT + '/jukebox/showPlaylist', {}, function ({ playlistId, success, msg }) {
         if (!success) {
-            alert(msg);
+/*           alert(msg);*/
+            alert("No songs to make a playlist from.")
             return;
         }
 
