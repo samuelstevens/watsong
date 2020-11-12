@@ -63,7 +63,7 @@ def test_query_session_songs(app: Flask) -> None:
 
 def test_query_filter(app: Flask) -> None:
     dance_value = 0.1
-    valence_value = 0.2
+    happiness_value = 0.2
     energy_value = 0.3
     lyrics_value = 0.2
 
@@ -77,13 +77,13 @@ def test_query_filter(app: Flask) -> None:
         assert "songs" in flask.session
 
         response = c.get(
-            f"/jukebox/filter?dance={dance_value}&valence={valence_value}&energy={energy_value}&lyrics={lyrics_value}"
+            f"/jukebox/filter?dance={dance_value}&happiness={happiness_value}&energy={energy_value}&lyrics={lyrics_value}"
         )
 
         # assert that the session feel has been updated
         assert "feel" in flask.session
         assert flask.session["feel"]["dance"] == dance_value
-        assert flask.session["feel"]["valence"] == valence_value
+        assert flask.session["feel"]["valence"] == happiness_value
         assert flask.session["feel"]["energy"] == energy_value
         assert flask.session["feel"]["lyrics"] == lyrics_value
 
